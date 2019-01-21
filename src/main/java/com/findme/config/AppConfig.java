@@ -25,7 +25,7 @@ import java.util.Properties;
 @Configuration
 @EnableTransactionManagement
 @EnableWebMvc
-@ComponentScan(basePackages = {"com.findme"})
+@ComponentScan(basePackages = {"com"})
 public class AppConfig implements WebMvcConfigurer {
 
     @Autowired
@@ -59,7 +59,7 @@ public class AppConfig implements WebMvcConfigurer {
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource());
-        em.setPackagesToScan(new String[]{"com.findme"});
+        em.setPackagesToScan(new String[]{"com"});
 
         JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
@@ -79,9 +79,9 @@ public class AppConfig implements WebMvcConfigurer {
     public DriverManagerDataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("oracle.jdbc.driver.OracleDriver");
-        dataSource.setUrl("jdbc:oracle:thin:@gromcode.c4qju9dqz8qa.us-east-2.rds.amazonaws.com:1521:ORCL");
+        dataSource.setUrl("jdbc:oracle:thin:@find-me.c4qju9dqz8qa.us-east-2.rds.amazonaws.com:1521:ORCL");
         dataSource.setUsername("main");
-        dataSource.setPassword("2016UKRainian");
+        dataSource.setPassword("123123123");
         return dataSource;
     }
 

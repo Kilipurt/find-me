@@ -1,0 +1,57 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Find me</title>
+</head>
+<body>
+
+<!--<div th:replace="fragments/header :: header"/>-->
+
+<div>
+    <div class="left">
+        <h1>Photo</h1>
+
+        <div>
+            <button class="btn">Send message</button>
+        </div>
+    </div>
+
+    <div class="right">
+        <p th:text="${user.firstName}"></p>
+        <p th:text="${user.lastName}"></p>
+        <p th:text="${user.phone}"></p>
+        <p th:text="${user.country}"></p>
+        <p th:text="${user.city}"></p>
+        <p th:text="${user.age}"></p>
+        <p th:text="${user.dateRegistered}"></p>
+        <p th:text="${user.dateLastActive}"></p>
+        <p th:text="${user.relationshipStatus}"></p>
+        <p th:text="${user.religion}"></p>
+        <p th:text="${user.school}"></p>
+        <p th:text="${user.university}"></p>
+    </div>
+</div>
+<!--/.container-->
+<!---->
+<!--<div th:replace="fragments/footer :: footer"/>-->
+
+</body>
+
+<style>
+    .left {
+        float: left;
+        width: 200px;
+        height: 300px;
+        border-style: solid;
+    }
+
+    .right {
+        margin-left: 300px;
+    }
+
+    .btn {
+        margin-top: 230px;
+    }
+</style>
+</html>
