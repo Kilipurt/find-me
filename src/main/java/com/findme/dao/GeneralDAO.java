@@ -8,6 +8,7 @@ import javax.persistence.PersistenceContext;
 
 @Transactional
 public abstract class GeneralDAO<T> {
+
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -15,10 +16,6 @@ public abstract class GeneralDAO<T> {
 
     public void setTypeParameterOfClass(Class<T> typeParameterOfClass) {
         this.typeParameterOfClass = typeParameterOfClass;
-    }
-
-    public void setEntityManager(EntityManager entityManager) {
-        this.entityManager = entityManager;
     }
 
     public T save(T obj) throws InternalServerError {

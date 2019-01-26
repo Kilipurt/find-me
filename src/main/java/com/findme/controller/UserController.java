@@ -35,7 +35,7 @@ public class UserController {
             return "profile";
         } catch (NumberFormatException | BadRequestException e) {
             model.addAttribute("exception", e);
-            return "exception";
+            return "badRequestException";
         }
     }
 }

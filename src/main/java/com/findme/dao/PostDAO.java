@@ -5,18 +5,11 @@ import com.findme.models.Post;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-
 @Repository
 @Transactional
 public class PostDAO extends GeneralDAO<Post> {
 
-    @PersistenceContext
-    private EntityManager entityManager;
-
     public PostDAO() {
-        setEntityManager(entityManager);
         setTypeParameterOfClass(Post.class);
     }
 
