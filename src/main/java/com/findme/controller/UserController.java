@@ -1,6 +1,7 @@
 package com.findme.controller;
 
 import com.findme.exception.BadRequestException;
+import com.findme.exception.NotFoundException;
 import com.findme.models.User;
 import com.findme.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,7 @@ public class UserController {
             User user = userService.findById(id);
 
             if (user == null) {
-                throw new BadRequestException("User with id " + id + " was not found");
+                throw new NotFoundException("User with id " + id + " was not found");
             }
 
             model.addAttribute("user", user);
@@ -36,6 +37,9 @@ public class UserController {
         } catch (NumberFormatException | BadRequestException e) {
             model.addAttribute("exception", e);
             return "badRequestException";
+        } catch (NotFoundException e) {
+            model.addAttribute("exception", e);
+            return "NotFoundException";
         }
     }
 }
