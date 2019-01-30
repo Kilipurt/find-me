@@ -1,6 +1,8 @@
 package com.findme.controller;
 
+import com.findme.config.AppConfig;
 import com.findme.exception.BadRequestException;
+import com.findme.exception.DbException;
 import com.findme.exception.NotFoundException;
 import com.findme.models.User;
 import com.findme.service.UserService;
@@ -39,7 +41,10 @@ public class UserController {
             return "badRequestException";
         } catch (NotFoundException e) {
             model.addAttribute("exception", e);
-            return "NotFoundException";
+            return "notFoundException";
+        } catch (DbException e) {
+            model.addAttribute("exception", e);
+            return "internalServerError";
         }
     }
 }
