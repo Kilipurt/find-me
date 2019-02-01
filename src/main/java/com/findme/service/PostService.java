@@ -2,7 +2,6 @@ package com.findme.service;
 
 import com.findme.dao.PostDAO;
 import com.findme.exception.BadRequestException;
-import com.findme.exception.DbException;
 import com.findme.exception.InternalServerError;
 import com.findme.models.Post;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +17,11 @@ public class PostService {
         this.postDAO = postDAO;
     }
 
-    public Post save(Post post) throws InternalServerError, DbException {
+    public Post save(Post post) throws InternalServerError {
         return postDAO.save(post);
     }
 
-    public Post update(Post post) throws InternalServerError, BadRequestException, DbException {
+    public Post update(Post post) throws InternalServerError, BadRequestException {
         if (post.getId() <= 0) {
             throw new BadRequestException("Wrong enter id " + post.getId());
         }
@@ -30,7 +29,7 @@ public class PostService {
         return postDAO.update(post);
     }
 
-    public void delete(long id) throws InternalServerError, BadRequestException, DbException {
+    public void delete(long id) throws InternalServerError, BadRequestException {
         if (id <= 0) {
             throw new BadRequestException("Wrong enter id " + id);
         }
@@ -38,7 +37,7 @@ public class PostService {
         postDAO.delete(id);
     }
 
-    public Post findById(long id) throws BadRequestException, DbException {
+    public Post findById(long id) throws BadRequestException, InternalServerError {
         if (id <= 0) {
             throw new BadRequestException("Wrong enter id " + id);
         }

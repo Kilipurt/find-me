@@ -29,7 +29,7 @@ public class UserDAO extends GeneralDAO<User> {
     }
 
     @Override
-    public User findById(long id) {
+    public User findById(long id) throws InternalServerError {
         return super.findById(id);
     }
 }

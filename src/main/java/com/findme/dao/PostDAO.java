@@ -29,7 +29,7 @@ public class PostDAO extends GeneralDAO<Post> {
     }
 
     @Override
-    public Post findById(long id) {
+    public Post findById(long id) throws InternalServerError {
         return super.findById(id);
     }
 }
