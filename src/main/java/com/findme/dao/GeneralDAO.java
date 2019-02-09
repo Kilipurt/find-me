@@ -14,6 +14,10 @@ public abstract class GeneralDAO<T> {
 
     private Class<T> typeParameterOfClass;
 
+    public EntityManager getEntityManager() {
+        return entityManager;
+    }
+
     public void setTypeParameterOfClass(Class<T> typeParameterOfClass) {
         this.typeParameterOfClass = typeParameterOfClass;
     }

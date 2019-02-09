@@ -7,6 +7,8 @@ import com.findme.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 @Service
 public class UserService {
 
@@ -17,7 +19,9 @@ public class UserService {
         this.userDAO = userDAO;
     }
 
-    public User save(User user) throws InternalServerError {
+    public User save(User user) throws BadRequestException, InternalServerError {
+        validate(user);
+        user.setDateRegistered(new Date());
         return userDAO.save(user);
     }
 
@@ -43,5 +47,31 @@ public class UserService {
         }
 
         return userDAO.findById(id);
+    }
+
+    private void validate(User user) throws BadRequestException, InternalServerError {
+        if (userDAO.getUserByPhone(user.getPhone()) != null) {
+            throw new BadRequestException("User with phone " + user.getPhone() + " already registered");
+        }
+
+        if (user.getFirstName().isEmpty()) {
+            throw new BadRequestException("First name " + user.getFirstName() + " is wrong");
+        }
+
+        if (user.getLastName().isEmpty()) {
+            throw new BadRequestException("Last name " + user.getLastName() + " is wrong");
+        }
+
+        if (user.getCountry().isEmpty()) {
+            throw new BadRequestException("Country " + user.getCountry() + " is wrong");
+        }
+
+        if (user.getCity().isEmpty()) {
+            throw new BadRequestException("City " + user.getCity() + " is wrong");
+        }
+
+        if (user.getAge() <= 0) {
+            throw new BadRequestException("Age " + user.getAge() + " is wrong");
+        }
     }
 }

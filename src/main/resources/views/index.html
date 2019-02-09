@@ -5,11 +5,62 @@
 </head>
 <body>
 
-<!--<div th:replace="fragments/header :: header"/>-->
 <h1>Welcome to Find me!</h1>
-<!--/.container-->
-<!---->
-<!--<div th:replace="fragments/footer :: footer"/>-->
 
+<form id="registration-form">
+    <p>*First name:</p>
+    <input type="text" name="firstName" required>
+
+    <p>*Last name:</p>
+    <input type="text" name="lastName" required>
+
+    <p>*Phone</p>
+    <input type="text" name="phone" required>
+
+    <p>*Country:</p>
+    <input type="text" name="country" required>
+
+    <p>*City:</p>
+    <input type="text" name="city" required>
+
+    <p>*Age:</p>
+    <input type="number" name="age" required>
+
+    <p>Relationship status:</p>
+    <input type="text" name="relationshipStatus">
+
+    <p>Religion:</p>
+    <input type="text" name="religion">
+
+    <p>School:</p>
+    <input type="text" name="school">
+
+    <p>University:</p>
+    <input type="text" name="university">
+
+    <p>Fields, that was marked as *, are required</p>
+
+    <button type="submit">Register</button>
+</form>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </body>
+
+<script>
+
+    $("#registration-form").submit(function () {
+        $.ajax({
+            url: "/user-registration",
+            type: "POST",
+            data: $('#registration-form').serialize(),
+            success: function success(xhr) {
+                alert(xhr.responseText);
+            },
+            error: function error(xhr) {
+                alert(xhr.responseText);
+            }
+        });
+    });
+</script>
+
 </html>
