@@ -7,6 +7,7 @@ import com.findme.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.NoResultException;
 import java.util.Date;
 
 @Service
@@ -50,8 +51,11 @@ public class UserService {
     }
 
     private void validate(User user) throws BadRequestException, InternalServerError {
-        if (userDAO.getUserByPhone(user.getPhone()) != null) {
+        try{
+            userDAO.getUserByPhone(user.getPhone());
             throw new BadRequestException("User with phone " + user.getPhone() + " already registered");
+        } catch (NoResultException e) {
+            //user with this phone was not found so user can be saved
         }
 
         if (user.getFirstName().isEmpty()) {

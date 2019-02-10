@@ -5,6 +5,7 @@ import com.findme.models.User;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
 @Repository
@@ -17,12 +18,14 @@ public class UserDAO extends GeneralDAO<User> {
         setTypeParameterOfClass(User.class);
     }
 
-    public User getUserByPhone(String phone) throws InternalServerError {
+    public User getUserByPhone(String phone) throws InternalServerError, NoResultException {
         try {
-            Query query = getEntityManager().createNativeQuery(GET_USER_BY_PHONE);
+            Query query = getEntityManager().createNativeQuery(GET_USER_BY_PHONE, User.class);
             query.setParameter("phone", phone);
 
             return (User) query.getSingleResult();
+        } catch (NoResultException e) {
+            throw new NoResultException("User was not found");
         } catch (Exception e) {
             throw new InternalServerError("Getting is failed");
         }

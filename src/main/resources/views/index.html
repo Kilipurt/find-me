@@ -53,8 +53,8 @@
             url: "/user-registration",
             type: "POST",
             data: $('#registration-form').serialize(),
-            success: function success(xhr) {
-                alert(xhr.responseText);
+            success: function success(data) {
+                alert(data.responseText);
             },
             error: function error(xhr) {
                 alert(xhr.responseText);
