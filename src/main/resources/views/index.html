@@ -47,19 +47,19 @@
 </body>
 
 <script>
-
-    $("#registration-form").submit(function () {
+    $("#registration-form").submit(function (e) {
         $.ajax({
             url: "/user-registration",
             type: "POST",
             data: $('#registration-form').serialize(),
-            success: function success(data) {
-                alert(data.responseText);
+            success: function success(xhr) {
+                alert(xhr);
             },
             error: function error(xhr) {
                 alert(xhr.responseText);
             }
         });
+        return false;
     });
 </script>
 
