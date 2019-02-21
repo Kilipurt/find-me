@@ -19,10 +19,6 @@
     </p>
 </form>
 
-<p>
-    <button id="logout" type="submit">Logout</button>
-</p>
-
 <form id="registration-form">
     <p>*First name:</p>
     <input type="text" name="firstName" required>
@@ -89,23 +85,9 @@
                 phoneField: document.getElementById("phoneField").value,
                 passwordField: document.getElementById("passwordField").value
             },
-            // success: function success(xhr) {
-            //     alert(xhr);
-            // },
-            error: function error(xhr) {
-                alert(xhr.responseText);
-            }
-        });
-        return false;
-    });
-
-    $('#logout').on("click", function (e) {
-        $.ajax({
-            url: "/logout",
-            type: "GET",
-            // success: function success(xhr) {
-            //     alert("success");
-            // },
+            success: function success(xhr) {
+                window.location.replace("/user/" + xhr.toString());
+            },
             error: function error(xhr) {
                 alert(xhr.responseText);
             }

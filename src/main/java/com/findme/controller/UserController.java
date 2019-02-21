@@ -5,7 +5,6 @@ import com.findme.exception.InternalServerError;
 import com.findme.exception.NotFoundException;
 import com.findme.models.User;
 import com.findme.service.UserService;
-import com.sun.deploy.net.HttpResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,10 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
 import java.util.Date;
 
 @Controller
@@ -74,12 +70,9 @@ public class UserController {
     ) {
         try {
             User user = userService.login(phone, password);
+            session.setAttribute("user", user);
 
-            if (session != null) {
-                session.setAttribute("user", user);
-            }
-
-            return new ResponseEntity<>("Login is success", HttpStatus.OK);
+            return new ResponseEntity<>(user.getId().toString(), HttpStatus.OK);
         } catch (InternalServerError e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (BadRequestException e) {
@@ -89,21 +82,17 @@ public class UserController {
 
     @RequestMapping(path = "/logout", method = RequestMethod.GET)
     public ResponseEntity<String> logout(HttpSession session) {
-        if (session != null) {
-            User user = (User) session.getAttribute("user");
-            user.setDateLastActive(new Date());
+        User user = (User) session.getAttribute("user");
+        user.setDateLastActive(new Date());
 
-            try {
-                userService.update(user);
-            } catch (InternalServerError e) {
-                return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-            } catch (BadRequestException e) {
-                return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-            }
-
+        try {
+            userService.update(user);
             session.invalidate();
+            return new ResponseEntity<>("success", HttpStatus.OK);
+        } catch (InternalServerError e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (BadRequestException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-
-        return new ResponseEntity<>("success", HttpStatus.OK);
     }
 }
