@@ -14,11 +14,13 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.util.Date;
+import java.util.List;
 
 @Controller
 public class UserController {
 
     private UserService userService;
+    private Long loginUserId;
 
     @Autowired
     public UserController(UserService userService) {
@@ -37,6 +39,8 @@ public class UserController {
             }
 
             model.addAttribute("user", user);
+            model.addAttribute("loginUserId", loginUserId);
+
             return "profile";
         } catch (NumberFormatException | BadRequestException e) {
             model.addAttribute("exception", e);
@@ -65,12 +69,13 @@ public class UserController {
     @RequestMapping(value = "/login", method = RequestMethod.GET)
     public ResponseEntity<String> login(
             HttpSession session,
-            @RequestParam(value = "phoneField") String phone,
-            @RequestParam(value = "passwordField") String password
+            @RequestParam(value = "phone") String phone,
+            @RequestParam(value = "password") String password
     ) {
         try {
             User user = userService.login(phone, password);
             session.setAttribute("user", user);
+            loginUserId = user.getId();
 
             return new ResponseEntity<>(user.getId().toString(), HttpStatus.OK);
         } catch (InternalServerError e) {
@@ -93,6 +98,47 @@ public class UserController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (BadRequestException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @RequestMapping(path = "/outcome-requests/{userId}", method = RequestMethod.GET)
+    public ResponseEntity<String> getOutcomeRequests(HttpSession session, Model model, @PathVariable String userId) {
+        try {
+            User user = (User) session.getAttribute("user");
+
+            if (user == null || Long.parseLong(userId) != user.getId()) {
+                throw new BadRequestException("User is not authorized");
+            }
+
+            List<User> list = userService.getOutcomeRequests(Long.parseLong(userId));
+            for(User u : list) {
+                System.out.println(u.getId());
+            }
+
+            model.addAttribute("outcomeRequests", userService.getOutcomeRequests(Long.parseLong(userId)));
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (IllegalStateException | BadRequestException | NumberFormatException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (InternalServerError e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @RequestMapping(path = "/income-requests/{userId}", method = RequestMethod.GET)
+    public ResponseEntity<String> getIncomeRequests(HttpSession session, Model model, @PathVariable String userId) {
+        try {
+            User user = (User) session.getAttribute("user");
+
+            if (user == null || Long.parseLong(userId) != user.getId()) {
+                throw new BadRequestException("User is not authorized");
+            }
+
+            model.addAttribute("incomeRequests", userService.getIncomeRequests(Long.parseLong(userId)));
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (IllegalStateException | BadRequestException | NumberFormatException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (InternalServerError e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

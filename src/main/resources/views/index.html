@@ -82,8 +82,8 @@
             url: "/login",
             type: "GET",
             data: {
-                phoneField: document.getElementById("phoneField").value,
-                passwordField: document.getElementById("passwordField").value
+                phone: document.getElementById("phoneField").value,
+                password: document.getElementById("passwordField").value
             },
             success: function success(xhr) {
                 window.location.replace("/user/" + xhr.toString());

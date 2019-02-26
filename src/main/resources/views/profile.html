@@ -18,6 +18,7 @@
     </div>
 
     <div class="right">
+        <p class="userId" id="userId" th:text="${user.id}"></p>
         <p th:text="${user.firstName}"></p>
         <p th:text="${user.lastName}"></p>
         <p th:text="${user.phone}"></p>
@@ -30,11 +31,32 @@
         <p th:text="${user.religion}"></p>
         <p th:text="${user.school}"></p>
         <p th:text="${user.university}"></p>
+        <p class="loginUserId" id="loginUserId" th:text="${loginUserId}"></p>
     </div>
+
+    <!--<div class="incomeRequests">-->
+        <!--<h4>Income Requests</h4>-->
+    <!--</div>-->
+
+    <!--<div class="outcomeRequests">-->
+        <!--<h4>Outcome Requests</h4>-->
+    <!--</div>-->
 </div>
 <!--/.container-->
 <!---->
 <!--<div th:replace="fragments/footer :: footer"/>-->
+
+<!--<p>-->
+    <!--<button id="incomeRequestsButton" type="submit">Income requests</button>-->
+<!--</p>-->
+
+<!--<p>-->
+    <!--<button id="outcomeRequestsButton" type="submit">Outcome requests</button>-->
+<!--</p>-->
+
+<p>
+    <button id="sentFriendRequest" type="submit">Add to friends</button>
+</p>
 
 <p class="logout">
     <button id="logout" type="submit">Logout</button>
@@ -62,9 +84,23 @@
     .logout {
         float: left;
     }
+
+    .userId {
+        display: none;
+    }
+
+    .loginUserId {
+        display: none;
+    }
 </style>
 
 <script>
+    // $(document).ready(function () {
+    //     if (document.getElementById("userId").value == document.getElementsByClassName("loginUserId").value) {
+    //         $("#sentFriendRequest").css("display", "none");
+    //     }
+    // });
+
     $('#logout').on("click", function (e) {
         $.ajax({
             url: "/logout",
@@ -78,5 +114,67 @@
         });
         return false;
     });
+
+    $('#sentFriendRequest').on("click", function (e) {
+        $.ajax({
+            url: "/add-relationship",
+            type: "POST",
+            data: {
+                userIdFrom: $('#loginUserId').text(),
+                userIdTo: $('#userId').text()
+            },
+            success: function success(xhr) {
+                alert("Request sent successfully");
+            },
+            error: function error(xhr) {
+                alert(xhr.responseText);
+            }
+        });
+        return false;
+    });
+
+    // $('#incomeRequestsButton').on("click", function (e) {
+    //     $.ajax({
+    //         url: "/income-requests/" + $('#loginUserId').text(),
+    //         type: "GET",
+    //         success: function success(xhr) {
+    //             var div = document.getElementsByClassName("incomeRequests");
+    //
+    //             var array = xhr;
+    //
+    //             for(var i = 0, len = array.length; i < len; i++) {
+    //                 var p = document.createElement("p");
+    //                 p.innerHTML = array['id'] + " " + array['firstName'] + " " + array['lastName'];
+    //                 div.insertAdjacentElement("beforeEnd", p);
+    //             }
+    //         },
+    //         error: function error(xhr) {
+    //             alert(xhr.responseText);
+    //         }
+    //     });
+    //     return false;
+    // });
+    //
+    // $('#outcomeRequestsButton').on("click", function (e) {
+    //     $.ajax({
+    //         url: "/outcome-requests/" + $('#loginUserId').text(),
+    //         type: "GET",
+    //         success: function success(xhr) {
+    //             var div = document.getElementsByClassName("outcomeRequests");
+    //
+    //             var array = xhr;
+    //
+    //             for(var i = 0, len = array.length; i < len; i++) {
+    //                 var p = document.createElement("p");
+    //                 p.innerHTML = array['id'] + " " + array['firstName'] + " " + array['lastName'];
+    //                 div.insertAdjacentElement("beforeEnd", p);
+    //             }
+    //         },
+    //         error: function error(xhr) {
+    //             alert(xhr.responseText);
+    //         }
+    //     });
+    //     return false;
+    // });
 </script>
 </html>

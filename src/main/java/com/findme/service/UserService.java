@@ -7,7 +7,9 @@ import com.findme.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class UserService {
@@ -20,7 +22,7 @@ public class UserService {
     }
 
     public User save(User user) throws BadRequestException, InternalServerError {
-        validate(user);
+        validateUser(user);
         user.setDateRegistered(new Date());
         return userDAO.save(user);
     }
@@ -63,7 +65,23 @@ public class UserService {
         return user;
     }
 
-    private void validate(User user) throws BadRequestException, InternalServerError {
+    public List<User> getIncomeRequests(long userId) throws InternalServerError, BadRequestException {
+        if (userId <= 0) {
+            throw new BadRequestException("Wrong user's id " + userId);
+        }
+
+        return userDAO.getIncomeRequests(userId);
+    }
+
+    public List<User> getOutcomeRequests(long userId) throws InternalServerError, BadRequestException {
+        if (userId <= 0) {
+            throw new BadRequestException("Wrong user's id " + userId);
+        }
+
+        return userDAO.getOutcomeRequests(userId);
+    }
+
+    private void validateUser(User user) throws BadRequestException, InternalServerError {
         if (userDAO.getUserByPhone(user.getPhone()) != null) {
             throw new BadRequestException("User with phone " + user.getPhone() + " already registered");
         }
