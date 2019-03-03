@@ -1,7 +1,6 @@
 package com.findme.dao;
 
 import com.findme.exception.InternalServerError;
-import com.findme.models.Relationship;
 import com.findme.models.User;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,14 +17,14 @@ public class UserDAO extends GeneralDAO<User> {
 
     private static final String GET_INCOME_REQUESTS
             = "SELECT USERS.* FROM USERS " +
-            "JOIN RELATIONSHIP ON USERS.ID = RELATIONSHIP.USER_TO " +
+            "JOIN RELATIONSHIP ON USERS.ID = RELATIONSHIP.USER_FROM " +
             "WHERE RELATIONSHIP.USER_TO = :userId " +
             "AND RELATIONSHIP.STATUS = 'REQUEST_SENT'";
 
     private static final String GET_OUTCOME_REQUESTS
             = "SELECT USERS.* FROM USERS " +
-            "JOIN RELATIONSHIP ON USERS.ID = RELATIONSHIP.USER_FROM " +
-            "WHERE RELATIONSHIP.USER_TO = :userId " +
+            "JOIN RELATIONSHIP ON USERS.ID = RELATIONSHIP.USER_TO " +
+            "WHERE RELATIONSHIP.USER_FROM = :userId " +
             "AND RELATIONSHIP.STATUS = 'REQUEST_SENT'";
 
     public UserDAO() {

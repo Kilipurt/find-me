@@ -24,9 +24,19 @@ public class RelationshipService {
         this.userDAO = userDAO;
     }
 
-    public String getRelationshipStatus(long userIdFrom, long userIdTo) throws BadRequestException, InternalServerError {
-        validateUsersId(userIdFrom, userIdTo);
-        return relationshipDAO.getRelationshipByUsersId(userIdFrom, userIdTo).getStatus();
+    public String getRelationshipStatus(long userIdFrom, long userIdTo) throws InternalServerError {
+        //validateUsersId(userIdFrom, userIdTo);
+        if(userIdFrom == userIdTo) {
+            return "You are friend to yourself";
+        }
+
+        Relationship relationship = relationshipDAO.getRelationshipByUsersId(userIdFrom, userIdTo);
+
+        if(relationship == null) {
+            return RelationshipStatus.NOT_FRIENDS.toString();
+        }
+
+        return relationship.getStatus();
     }
 
     public Relationship save(long userIdFrom, long userIdTo) throws InternalServerError, BadRequestException {

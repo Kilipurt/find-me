@@ -34,24 +34,28 @@
         <p class="loginUserId" id="loginUserId" th:text="${loginUserId}"></p>
     </div>
 
-    <!--<div class="incomeRequests">-->
-        <!--<h4>Income Requests</h4>-->
-    <!--</div>-->
+    <div class="relationshipStatus" id="relationshipStatus">
+        <p th:text="${relationshipStatus}"></p>
+    </div>
 
-    <!--<div class="outcomeRequests">-->
-        <!--<h4>Outcome Requests</h4>-->
-    <!--</div>-->
+    <div class="incomeRequests" id="incomeRequests">
+        <h4>Income Requests</h4>
+    </div>
+
+    <div class="outcomeRequests" id="outcomeRequests">
+        <h4>Outcome Requests</h4>
+    </div>
 </div>
 <!--/.container-->
 <!---->
 <!--<div th:replace="fragments/footer :: footer"/>-->
 
 <!--<p>-->
-    <!--<button id="incomeRequestsButton" type="submit">Income requests</button>-->
+<!--<button id="incomeRequestsButton" type="submit">Income requests</button>-->
 <!--</p>-->
 
 <!--<p>-->
-    <!--<button id="outcomeRequestsButton" type="submit">Outcome requests</button>-->
+<!--<button id="outcomeRequestsButton" type="submit">Outcome requests</button>-->
 <!--</p>-->
 
 <p>
@@ -95,11 +99,85 @@
 </style>
 
 <script>
-    // $(document).ready(function () {
-    //     if (document.getElementById("userId").value == document.getElementsByClassName("loginUserId").value) {
-    //         $("#sentFriendRequest").css("display", "none");
-    //     }
-    // });
+    $(document).ready(function () {
+        if ($('#userId').text() == $('#loginUserId').text()) {
+            document.getElementById("sentFriendRequest").style.display = 'none';
+            document.getElementById("relationshipStatus").style.display = 'none';
+        } else {
+            document.getElementById("incomeRequests").style.display = 'none';
+            document.getElementById("outcomeRequests").style.display = 'none';
+        }
+    });
+
+    $(document).ready(function (e) {
+        $.ajax({
+            url: "/income-requests/" + $('#loginUserId').text(),
+            type: "GET",
+            success: function success(xhr) {
+                var incomeRequestsDiv = document.getElementById("incomeRequests");
+
+                var users = JSON.parse('{' + xhr.toString() + '}');
+
+                for (var i = 0; i < users.users.length; i++) {
+                    var aloneRequestDiv = document.createElement("div");
+
+                    aloneRequestDiv.innerHTML = users.users[i].id + " "
+                        + users.users[i].firstName + " "
+                        + users.users[i].lastName + " ";
+
+                    var denyButton = document.createElement("button");
+                    denyButton.innerHTML = "Deny request";
+                    denyButton.id = "denyButton" + users.users[i].id;
+                    denyButton.addEventListener("click", denyRequest);
+
+                    aloneRequestDiv.insertAdjacentElement("beforeEnd", denyButton);
+
+                    var acceptButton = document.createElement("button");
+                    acceptButton.innerHTML = "Accept request";
+                    acceptButton.id = "acceptButton" + users.users[i].id;
+                    acceptButton.addEventListener("click", acceptRequest);
+
+                    aloneRequestDiv.insertAdjacentElement("beforeEnd", acceptButton);
+                    incomeRequestsDiv.insertAdjacentElement("beforeEnd", aloneRequestDiv);
+                }
+            },
+            error: function error(xhr) {
+                alert(xhr.responseText);
+            }
+        });
+        return false;
+    });
+
+    $(document).ready(function (e) {
+        $.ajax({
+            url: "/outcome-requests/" + $('#loginUserId').text(),
+            type: "GET",
+            success: function success(xhr) {
+                var outcomeRequestsDiv = document.getElementById("outcomeRequests");
+                var users = JSON.parse('{' + xhr.toString() + '}');
+
+                for (var i = 0; i < users.users.length; i++) {
+                    var aloneRequestDiv = document.createElement("div");
+
+                    aloneRequestDiv.innerHTML = users.users[i].id + " "
+                        + users.users[i].firstName + " "
+                        + users.users[i].lastName + " ";
+
+                    var cancelButton = document.createElement("button");
+                    cancelButton.innerHTML = "Cancel request";
+                    cancelButton.id = "cancelButton" + users.users[i].id;
+                    cancelButton.addEventListener("click", cancelRequest);
+
+                    aloneRequestDiv.insertAdjacentElement("beforeEnd", cancelButton);
+                    outcomeRequestsDiv.insertAdjacentElement("beforeEnd", aloneRequestDiv);
+                }
+            },
+            error: function error(xhr) {
+                alert(xhr.responseText);
+            }
+        });
+        return false;
+    });
 
     $('#logout').on("click", function (e) {
         $.ajax({
@@ -133,48 +211,46 @@
         return false;
     });
 
-    // $('#incomeRequestsButton').on("click", function (e) {
-    //     $.ajax({
-    //         url: "/income-requests/" + $('#loginUserId').text(),
-    //         type: "GET",
-    //         success: function success(xhr) {
-    //             var div = document.getElementsByClassName("incomeRequests");
-    //
-    //             var array = xhr;
-    //
-    //             for(var i = 0, len = array.length; i < len; i++) {
-    //                 var p = document.createElement("p");
-    //                 p.innerHTML = array['id'] + " " + array['firstName'] + " " + array['lastName'];
-    //                 div.insertAdjacentElement("beforeEnd", p);
-    //             }
-    //         },
-    //         error: function error(xhr) {
-    //             alert(xhr.responseText);
-    //         }
-    //     });
-    //     return false;
-    // });
-    //
-    // $('#outcomeRequestsButton').on("click", function (e) {
-    //     $.ajax({
-    //         url: "/outcome-requests/" + $('#loginUserId').text(),
-    //         type: "GET",
-    //         success: function success(xhr) {
-    //             var div = document.getElementsByClassName("outcomeRequests");
-    //
-    //             var array = xhr;
-    //
-    //             for(var i = 0, len = array.length; i < len; i++) {
-    //                 var p = document.createElement("p");
-    //                 p.innerHTML = array['id'] + " " + array['firstName'] + " " + array['lastName'];
-    //                 div.insertAdjacentElement("beforeEnd", p);
-    //             }
-    //         },
-    //         error: function error(xhr) {
-    //             alert(xhr.responseText);
-    //         }
-    //     });
-    //     return false;
-    // });
+    function cancelRequest() {
+        $.ajax({
+            url: "/delete-relationship?userIdFrom=" + $('#loginUserId').text() + "&userIdTo=" + this.id.replace('cancelButton', ''),
+            type: 'DELETE',
+            success: function success(xhr) {
+                alert("success");
+            },
+            error: function error(xhr) {
+                alert(xhr.responseText);
+            }
+        });
+        return false;
+    }
+
+    function denyRequest() {
+        $.ajax({
+            url: "/delete-relationship?userIdTo=" + $('#loginUserId').text() + "&userIdFrom=" + this.id.replace('denyButton', ''),
+            type: 'DELETE',
+            success: function success(xhr) {
+                alert("success");
+            },
+            error: function error(xhr) {
+                alert(xhr.responseText);
+            }
+        });
+        return false;
+    }
+
+    function acceptRequest() {
+        $.ajax({
+            url: "/add-relationship?userIdTo=" + $('#loginUserId').text() + "&userIdFrom=" + this.id.replace('acceptButton', ''),
+            type: 'POST',
+            success: function success(xhr) {
+                alert("success");
+            },
+            error: function error(xhr) {
+                alert(xhr.responseText);
+            }
+        });
+        return false;
+    }
 </script>
 </html>
