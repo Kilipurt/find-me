@@ -213,8 +213,9 @@
 
     function cancelRequest() {
         $.ajax({
-            url: "/delete-relationship?userIdFrom=" + $('#loginUserId').text() + "&userIdTo=" + this.id.replace('cancelButton', ''),
-            type: 'DELETE',
+            url: "/update-relationship?userIdFrom=" + $('#loginUserId').text() + "&userIdTo="
+            + this.id.replace('cancelButton', '') + "&status=NOT_FRIENDS",
+            type: 'PUT',
             success: function success(xhr) {
                 alert("success");
             },
@@ -227,8 +228,9 @@
 
     function denyRequest() {
         $.ajax({
-            url: "/delete-relationship?userIdTo=" + $('#loginUserId').text() + "&userIdFrom=" + this.id.replace('denyButton', ''),
-            type: 'DELETE',
+            url: "/update-relationship?userIdTo=" + $('#loginUserId').text() + "&userIdFrom="
+            + this.id.replace('denyButton', '') + "&status=REQUEST_DENIED",
+            type: 'PUT',
             success: function success(xhr) {
                 alert("success");
             },
@@ -241,8 +243,9 @@
 
     function acceptRequest() {
         $.ajax({
-            url: "/add-relationship?userIdTo=" + $('#loginUserId').text() + "&userIdFrom=" + this.id.replace('acceptButton', ''),
-            type: 'POST',
+            url: "/update-relationship?userIdTo=" + $('#loginUserId').text() + "&userIdFrom="
+            + this.id.replace('acceptButton', '')  + "status=FRIENDS",
+            type: 'PUT',
             success: function success(xhr) {
                 alert("success");
             },

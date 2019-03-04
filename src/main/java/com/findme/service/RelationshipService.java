@@ -5,12 +5,11 @@ import com.findme.dao.UserDAO;
 import com.findme.exception.BadRequestException;
 import com.findme.exception.InternalServerError;
 import com.findme.models.Relationship;
+import com.findme.models.RelationshipKey;
 import com.findme.models.RelationshipStatus;
 import com.findme.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import javax.persistence.criteria.CriteriaBuilder;
 
 @Service
 public class RelationshipService {
@@ -26,14 +25,14 @@ public class RelationshipService {
 
     public String getRelationshipStatus(long userIdFrom, long userIdTo) throws InternalServerError {
         //validateUsersId(userIdFrom, userIdTo);
-        if(userIdFrom == userIdTo) {
+        if (userIdFrom == userIdTo) {
             return "You are friend to yourself";
         }
 
         Relationship relationship = relationshipDAO.getRelationshipByUsersId(userIdFrom, userIdTo);
 
-        if(relationship == null) {
-            return RelationshipStatus.NOT_FRIENDS.toString();
+        if (relationship == null) {
+            return "Not friends";
         }
 
         return relationship.getStatus();
@@ -45,27 +44,37 @@ public class RelationshipService {
         User userFrom = userDAO.findById(userIdFrom);
         User userTo = userDAO.findById(userIdTo);
 
-        validateRelationshipForSave(userFrom, userTo);
+        if (userFrom == null || userTo == null) {
+            throw new BadRequestException("One of user who want to save relationship does not exist");
+        }
 
-        Relationship newRelationship = new Relationship();
-        newRelationship.setStatus(RelationshipStatus.REQUEST_SENT.toString());
-        newRelationship.setUserFrom(userFrom);
-        newRelationship.setUserTo(userTo);
+        Relationship relationship = relationshipDAO.getRelationshipByUsersId(userIdFrom, userIdTo);
 
-        return relationshipDAO.save(newRelationship);
+        if (relationship != null
+                && (!relationship.getStatus().equals(RelationshipStatus.FRIENDS.toString())
+                || !relationship.getStatus().equals(RelationshipStatus.REQUEST_SENT.toString()))) {
+
+            relationship.setStatus(RelationshipStatus.REQUEST_SENT.toString());
+            return relationshipDAO.update(relationship);
+
+        } else {
+
+            Relationship newRelationship = new Relationship();
+            newRelationship.setStatus(RelationshipStatus.REQUEST_SENT.toString());
+
+            RelationshipKey newRelationshipKey = new RelationshipKey();
+            newRelationshipKey.setUserFrom(userFrom);
+            newRelationshipKey.setUserTo(userTo);
+
+            newRelationship.setRelationshipKey(newRelationshipKey);
+
+            return relationshipDAO.save(newRelationship);
+        }
     }
 
-    public Relationship update(long userIdFrom, long userIdTo, String status, User loginUser)
+    public Relationship update(long userIdFrom, long userIdTo, String status, User loggedInUser)
             throws InternalServerError, BadRequestException {
-        validateUsersId(userIdFrom, userIdTo);
-
-        User userFrom = userDAO.findById(userIdFrom);
-        User userTo = userDAO.findById(userIdTo);
-
-        if (status.equals(RelationshipStatus.FRIENDS.toString()) && !loginUser.getId().equals(userTo.getId())) {
-            throw new BadRequestException("User " + loginUser.getId()
-                    + " has not enough rights to accept user " + userFrom.getId() + " to friends");
-        }
+        validateForUpdate(status, loggedInUser, userIdFrom, userIdTo);
 
         Relationship relationship = relationshipDAO.getRelationshipByUsersId(userIdFrom, userIdTo);
 
@@ -78,31 +87,33 @@ public class RelationshipService {
         return relationshipDAO.update(relationship);
     }
 
-    public void delete(long userIdFrom, long userIdTo) throws InternalServerError, BadRequestException {
+    private void validateForUpdate(String status, User loggedInUser, long userIdFrom, long userIdTo)
+            throws BadRequestException, InternalServerError {
+
         validateUsersId(userIdFrom, userIdTo);
 
         User userFrom = userDAO.findById(userIdFrom);
         User userTo = userDAO.findById(userIdTo);
-        Relationship relationship = relationshipDAO.getRelationshipByUsersId(userIdFrom, userIdTo);
 
-        validateRelationshipForDelete(userFrom, userTo, relationship);
-
-        relationshipDAO.delete(relationship.getId());
-    }
-
-    private void validateRelationshipForDelete(User userFrom, User userTo, Relationship relationship)
-            throws BadRequestException {
-
-        if (userFrom == null) {
-            throw new BadRequestException("User who want to delete relationship does not exist");
+        if (userFrom == null || userTo == null) {
+            throw new BadRequestException("One of user who want to update relationship does not exist");
         }
 
-        if (userTo == null) {
-            throw new BadRequestException("User who got friend request that must be deleted does not exist");
+        if (status.equals(RelationshipStatus.FRIENDS.toString()) && !loggedInUser.getId().equals(userTo.getId())) {
+            throw new BadRequestException("User " + loggedInUser.getId()
+                    + " has not enough rights to accept request from user " + userFrom.getId());
         }
 
-        if (relationship == null) {
-            throw new BadRequestException("Relationship between users " + userFrom.getId() + " and " + userTo.getId() + " does not exist");
+        if (status.equals(RelationshipStatus.REQUEST_DENIED.toString()) && !loggedInUser.getId().equals(userTo.getId())) {
+            throw new BadRequestException("User " + loggedInUser.getId()
+                    + " has not enough rights to deny request from user " + userFrom.getId());
+        }
+
+        if (status.equals(RelationshipStatus.PAST_FRIENDS.toString())
+                && (!loggedInUser.getId().equals(userFrom.getId())
+                || !loggedInUser.getId().equals(userTo.getId()))) {
+            throw new BadRequestException("User " + loggedInUser.getId()
+                    + " has not enough rights to delete user " + userFrom.getId() + " from friends");
         }
     }
 
@@ -117,23 +128,6 @@ public class RelationshipService {
 
         if (userIdFrom == userIdTo) {
             throw new BadRequestException("User " + userIdFrom + " can't sent request to himself");
-        }
-    }
-
-    private void validateRelationshipForSave(User userFrom, User userTo)
-            throws BadRequestException, InternalServerError {
-        if (userFrom == null) {
-            throw new BadRequestException("User who sent friend request does not not exist");
-        }
-
-        if (userTo == null) {
-            throw new BadRequestException("User who will get friend request does not exist");
-        }
-
-        Relationship relationship = relationshipDAO.getRelationshipByUsersId(userFrom.getId(), userTo.getId());
-
-        if (relationship != null) {
-            throw new BadRequestException("Relationship between users " + userFrom.getId() + " and " + userTo.getId() + " already exist");
         }
     }
 }
