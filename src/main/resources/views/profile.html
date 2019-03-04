@@ -34,7 +34,7 @@
         <p class="loginUserId" id="loginUserId" th:text="${loginUserId}"></p>
     </div>
 
-    <div class="relationshipStatus" id="relationshipStatus">
+    <div class="relationship-status" id="relationship-status">
         <p th:text="${relationshipStatus}"></p>
     </div>
 
@@ -102,7 +102,7 @@
     $(document).ready(function () {
         if ($('#userId').text() == $('#loginUserId').text()) {
             document.getElementById("sentFriendRequest").style.display = 'none';
-            document.getElementById("relationshipStatus").style.display = 'none';
+            document.getElementById("relationship-status").style.display = 'none';
         } else {
             document.getElementById("incomeRequests").style.display = 'none';
             document.getElementById("outcomeRequests").style.display = 'none';
