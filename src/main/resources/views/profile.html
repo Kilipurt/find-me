@@ -35,7 +35,7 @@
     </div>
 
     <div class="relationship-status" id="relationship-status">
-        <p th:text="${relationshipStatus}"></p>
+        <p id="status-field" th:text="${relationshipStatus}"></p>
     </div>
 
     <div class="incomeRequests" id="incomeRequests">
@@ -49,14 +49,6 @@
 <!--/.container-->
 <!---->
 <!--<div th:replace="fragments/footer :: footer"/>-->
-
-<!--<p>-->
-<!--<button id="incomeRequestsButton" type="submit">Income requests</button>-->
-<!--</p>-->
-
-<!--<p>-->
-<!--<button id="outcomeRequestsButton" type="submit">Outcome requests</button>-->
-<!--</p>-->
 
 <p>
     <button id="sentFriendRequest" type="submit">Add to friends</button>
@@ -194,27 +186,34 @@
     });
 
     $('#sentFriendRequest').on("click", function (e) {
-        $.ajax({
-            url: "/add-relationship",
-            type: "POST",
-            data: {
-                userIdFrom: $('#loginUserId').text(),
-                userIdTo: $('#userId').text()
-            },
-            success: function success(xhr) {
-                alert("Request sent successfully");
-            },
-            error: function error(xhr) {
-                alert(xhr.responseText);
-            }
-        });
-        return false;
+        if ($('#status-field').text() == 'Not friends') {
+            $.ajax({
+                url: "/add-relationship",
+                type: "POST",
+                data: {
+                    userIdFrom: $('#loginUserId').text(),
+                    userIdTo: $('#userId').text()
+                },
+                success: function success(xhr) {
+                    alert("Request sent successfully");
+                },
+                error: function error(xhr) {
+                    alert(xhr.responseText);
+                }
+            });
+            return false;
+        } else {
+            var url = "/update-relationship?userIdTo=" + $('#userId').text() + "&userIdFrom="
+                + $('#loginUserId').text() + "&status=REQUEST_SENT";
+
+            updateRelationship(url)
+        }
     });
 
     function cancelRequest() {
         $.ajax({
             url: "/update-relationship?userIdFrom=" + $('#loginUserId').text() + "&userIdTo="
-            + this.id.replace('cancelButton', '') + "&status=NOT_FRIENDS",
+            + this.id.replace('cancelButton', '') + "&status=DELETED",
             type: 'PUT',
             success: function success(xhr) {
                 alert("success");
@@ -229,7 +228,7 @@
     function denyRequest() {
         $.ajax({
             url: "/update-relationship?userIdTo=" + $('#loginUserId').text() + "&userIdFrom="
-            + this.id.replace('denyButton', '') + "&status=REQUEST_DENIED",
+            + this.id.replace('denyButton', '') + "&status=REQUEST_DECLINED",
             type: 'PUT',
             success: function success(xhr) {
                 alert("success");
@@ -242,9 +241,28 @@
     }
 
     function acceptRequest() {
+        // $.ajax({
+        //     url: "/update-relationship?userIdTo=" + $('#loginUserId').text() + "&userIdFrom="
+        //     + this.id.replace('acceptButton', '')  + "&status=FRIENDS",
+        //     type: 'PUT',
+        //     success: function success(xhr) {
+        //         alert("success");
+        //     },
+        //     error: function error(xhr) {
+        //         alert(xhr.responseText);
+        //     }
+        // });
+        // return false;
+
+        var url = "/update-relationship?userIdTo=" + $('#loginUserId').text() + "&userIdFrom="
+            + this.id.replace('acceptButton', '') + "&status=FRIENDS";
+
+        updateRelationship(url)
+    }
+
+    function updateRelationship(url) {
         $.ajax({
-            url: "/update-relationship?userIdTo=" + $('#loginUserId').text() + "&userIdFrom="
-            + this.id.replace('acceptButton', '')  + "status=FRIENDS",
+            url: url,
             type: 'PUT',
             success: function success(xhr) {
                 alert("success");

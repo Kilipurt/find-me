@@ -30,8 +30,12 @@ public class RelationshipController {
         try {
             User loggedInUser = (User) session.getAttribute("user");
 
-            if (loggedInUser == null || Long.parseLong(userIdFrom) != loggedInUser.getId()) {
+            if (loggedInUser == null) {
                 throw new BadRequestException("User is not authorized");
+            }
+
+            if (Long.parseLong(userIdFrom) != loggedInUser.getId()) {
+                throw new BadRequestException("User has not enough rights");
             }
 
             relationshipService.save(Long.parseLong(userIdFrom), Long.parseLong(userIdTo));
@@ -65,26 +69,4 @@ public class RelationshipController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-//    @RequestMapping(path = "/delete-relationship", method = RequestMethod.DELETE)
-//    public ResponseEntity<String> deleteRelationship(
-//            HttpSession session,
-//            @RequestParam(value = "userIdFrom") String userIdFrom,
-//            @RequestParam(value = "userIdTo") String userIdTo
-//    ) {
-//        try {
-//            User loggedInUser = (User) session.getAttribute("user");
-//
-//            if (loggedInUser == null) {
-//                throw new BadRequestException("User is not authorized");
-//            }
-//
-//            relationshipService.delete(Long.parseLong(userIdFrom), Long.parseLong(userIdTo));
-//            return new ResponseEntity<>(HttpStatus.OK);
-//        } catch (IllegalStateException | BadRequestException | NumberFormatException e) {
-//            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-//        } catch (InternalServerError e) {
-//            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//    }
 }

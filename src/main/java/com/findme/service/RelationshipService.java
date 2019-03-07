@@ -5,7 +5,6 @@ import com.findme.dao.UserDAO;
 import com.findme.exception.BadRequestException;
 import com.findme.exception.InternalServerError;
 import com.findme.models.Relationship;
-import com.findme.models.RelationshipKey;
 import com.findme.models.RelationshipStatus;
 import com.findme.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,6 @@ public class RelationshipService {
     }
 
     public String getRelationshipStatus(long userIdFrom, long userIdTo) throws InternalServerError {
-        //validateUsersId(userIdFrom, userIdTo);
         if (userIdFrom == userIdTo) {
             return "You are friend to yourself";
         }
@@ -41,79 +39,95 @@ public class RelationshipService {
     public Relationship save(long userIdFrom, long userIdTo) throws InternalServerError, BadRequestException {
         validateUsersId(userIdFrom, userIdTo);
 
-        User userFrom = userDAO.findById(userIdFrom);
         User userTo = userDAO.findById(userIdTo);
 
-        if (userFrom == null || userTo == null) {
+        if (userTo == null) {
             throw new BadRequestException("One of user who want to save relationship does not exist");
         }
 
-        Relationship relationship = relationshipDAO.getRelationshipByUsersId(userIdFrom, userIdTo);
+        Relationship newRelationship = new Relationship();
+        newRelationship.setStatus(RelationshipStatus.REQUEST_SENT.toString());
+        newRelationship.setUserFrom(userDAO.findById(userIdFrom));
+        newRelationship.setUserTo(userTo);
 
-        if (relationship != null
-                && (!relationship.getStatus().equals(RelationshipStatus.FRIENDS.toString())
-                || !relationship.getStatus().equals(RelationshipStatus.REQUEST_SENT.toString()))) {
-
-            relationship.setStatus(RelationshipStatus.REQUEST_SENT.toString());
-            return relationshipDAO.update(relationship);
-
-        } else {
-
-            Relationship newRelationship = new Relationship();
-            newRelationship.setStatus(RelationshipStatus.REQUEST_SENT.toString());
-
-            RelationshipKey newRelationshipKey = new RelationshipKey();
-            newRelationshipKey.setUserFrom(userFrom);
-            newRelationshipKey.setUserTo(userTo);
-
-            newRelationship.setRelationshipKey(newRelationshipKey);
-
-            return relationshipDAO.save(newRelationship);
-        }
+        return relationshipDAO.save(newRelationship);
     }
 
     public Relationship update(long userIdFrom, long userIdTo, String status, User loggedInUser)
             throws InternalServerError, BadRequestException {
-        validateForUpdate(status, loggedInUser, userIdFrom, userIdTo);
+        validateUsersId(userIdFrom, userIdTo);
 
         Relationship relationship = relationshipDAO.getRelationshipByUsersId(userIdFrom, userIdTo);
 
-        if (relationship == null) {
-            throw new BadRequestException("Relationship between user "
-                    + userIdFrom + " and user " + userIdTo + " is not exist");
-        }
+        validateRelationship(userIdFrom, userIdTo, status, relationship);
+        validateLoggedInUserRights(userIdFrom, userIdTo, status, loggedInUser);
 
         relationship.setStatus(RelationshipStatus.valueOf(status).toString());
         return relationshipDAO.update(relationship);
     }
 
-    private void validateForUpdate(String status, User loggedInUser, long userIdFrom, long userIdTo)
-            throws BadRequestException, InternalServerError {
-
-        validateUsersId(userIdFrom, userIdTo);
-
-        User userFrom = userDAO.findById(userIdFrom);
-        User userTo = userDAO.findById(userIdTo);
-
-        if (userFrom == null || userTo == null) {
-            throw new BadRequestException("One of user who want to update relationship does not exist");
+    private void validateRelationship(long userIdFrom, long userIdTo, String status, Relationship relationship) throws BadRequestException {
+        if (relationship == null) {
+            throw new BadRequestException("Relationship between user "
+                    + userIdFrom + " and user " + userIdTo + " is not exist");
         }
 
-        if (status.equals(RelationshipStatus.FRIENDS.toString()) && !loggedInUser.getId().equals(userTo.getId())) {
-            throw new BadRequestException("User " + loggedInUser.getId()
-                    + " has not enough rights to accept request from user " + userFrom.getId());
+        if (status.equals(relationship.getStatus())) {
+            throw new BadRequestException("It's impossible to update relationship to the same status");
         }
 
-        if (status.equals(RelationshipStatus.REQUEST_DENIED.toString()) && !loggedInUser.getId().equals(userTo.getId())) {
+        if (relationship.getStatus().equals(RelationshipStatus.REQUEST_SENT.toString())
+                && !(status.equals(RelationshipStatus.FRIENDS.toString())
+                || status.equals(RelationshipStatus.REQUEST_DECLINED.toString())
+                || status.equals(RelationshipStatus.DELETED.toString()))) {
+            throw new BadRequestException("It's impossible to update relationship from status " +
+                    "REQUEST_SENT to other expect FRIENDS or REQUEST_DECLINED or DELETED");
+        }
+
+        if (relationship.getStatus().equals(RelationshipStatus.FRIENDS.toString())
+                && !status.equals(RelationshipStatus.PAST_FRIENDS.toString())) {
+            throw new BadRequestException("It's impossible to update relationship from status " +
+                    "FRIENDS to other expect PAST_FRIENDS");
+        }
+
+        if (relationship.getStatus().equals(RelationshipStatus.REQUEST_DECLINED.toString())
+                && !status.equals(RelationshipStatus.REQUEST_SENT.toString())) {
+            throw new BadRequestException("It's impossible to update relationship from status " +
+                    "REQUEST_DECLINED to other expect REQUEST_SENT");
+        }
+
+        if (relationship.getStatus().equals(RelationshipStatus.PAST_FRIENDS.toString())
+                && !status.equals(RelationshipStatus.REQUEST_SENT.toString())) {
+            throw new BadRequestException("It's impossible to update relationship from status " +
+                    "PAST_FRIENDS to other expect REQUEST_SENT");
+        }
+    }
+
+    private void validateLoggedInUserRights(long userIdFrom, long userIdTo, String status, User loggedInUser) throws BadRequestException {
+        if ((status.equals(RelationshipStatus.FRIENDS.toString())
+                || status.equals(RelationshipStatus.REQUEST_DECLINED.toString()))
+                && !loggedInUser.getId().equals(userIdTo)) {
             throw new BadRequestException("User " + loggedInUser.getId()
-                    + " has not enough rights to deny request from user " + userFrom.getId());
+                    + " has not enough rights to update relationship");
+        }
+
+        if (status.equals(RelationshipStatus.DELETED.toString())
+                && !loggedInUser.getId().equals(userIdFrom)) {
+            throw new BadRequestException("User " + loggedInUser.getId()
+                    + " has not enough rights to update relationship");
         }
 
         if (status.equals(RelationshipStatus.PAST_FRIENDS.toString())
-                && (!loggedInUser.getId().equals(userFrom.getId())
-                || !loggedInUser.getId().equals(userTo.getId()))) {
+                && (!loggedInUser.getId().equals(userIdFrom)
+                || !loggedInUser.getId().equals(userIdTo))) {
             throw new BadRequestException("User " + loggedInUser.getId()
-                    + " has not enough rights to delete user " + userFrom.getId() + " from friends");
+                    + " has not enough rights for update relationship");
+        }
+
+        if (status.equals(RelationshipStatus.REQUEST_SENT.toString())
+                && !loggedInUser.getId().equals(userIdFrom)) {
+            throw new BadRequestException("User " + loggedInUser.getId()
+                    + " has not enough rights to update relationship");
         }
     }
 
