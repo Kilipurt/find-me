@@ -57,13 +57,7 @@ public class RelationshipController {
     ) {
         try {
             User loggedInUser = (User) session.getAttribute("user");
-
-            long idFrom = Long.parseLong(userIdFrom);
-            long idTo = Long.parseLong(userIdTo);
-
-            validateLoggedInUser(loggedInUser, idFrom, idTo, status);
-
-            relationshipService.update(idFrom, idTo, status);
+            relationshipService.update(Long.parseLong(userIdFrom), Long.parseLong(userIdTo), status, loggedInUser);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (IllegalStateException | BadRequestException | NumberFormatException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -72,24 +66,6 @@ public class RelationshipController {
         }
     }
 
-    private void validateLoggedInUser(User loggedInUser, long userIdFrom, long userIdTo, String status) throws BadRequestException {
-        if (loggedInUser == null) {
-            throw new BadRequestException("User is not authorized");
-        }
 
-        if (loggedInUser.getId() == userIdFrom && !(status.equals(RelationshipStatus.DELETED.toString())
-                || status.equals(RelationshipStatus.REQUEST_SENT.toString()))) {
-            throw new BadRequestException("User " + loggedInUser.getId() + " has not enough rights");
-        }
-
-        if (loggedInUser.getId() == userIdTo && !(status.equals(RelationshipStatus.FRIENDS.toString())
-                || status.equals(RelationshipStatus.REQUEST_DECLINED.toString()))) {
-            throw new BadRequestException("User " + loggedInUser.getId() + " has not enough rights");
-        }
-
-        if (loggedInUser.getId() != userIdTo || loggedInUser.getId() != userIdFrom) {
-            throw new BadRequestException("User " + loggedInUser.getId() + " has not enough rights");
-        }
-    }
 
 }

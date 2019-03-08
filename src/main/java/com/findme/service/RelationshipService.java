@@ -53,16 +53,37 @@ public class RelationshipService {
         return relationshipDAO.save(newRelationship);
     }
 
-    public Relationship update(long userIdFrom, long userIdTo, String status)
+    public Relationship update(long userIdFrom, long userIdTo, String status, User loggedInUser)
             throws InternalServerError, BadRequestException {
         validateUsersId(userIdFrom, userIdTo);
 
         Relationship relationship = relationshipDAO.getRelationshipByUsersId(userIdFrom, userIdTo);
 
+        validateLoggedInUser(loggedInUser, userIdFrom, userIdTo, status);
         validateRelationship(userIdFrom, userIdTo, status, relationship);
 
         relationship.setStatus(RelationshipStatus.valueOf(status).toString());
         return relationshipDAO.update(relationship);
+    }
+
+    private void validateLoggedInUser(User loggedInUser, long userIdFrom, long userIdTo, String status) throws BadRequestException {
+        if (loggedInUser == null) {
+            throw new BadRequestException("User is not authorized");
+        }
+
+        if (loggedInUser.getId() != userIdTo || loggedInUser.getId() != userIdFrom) {
+            throw new BadRequestException("User " + loggedInUser.getId() + " has not enough rights");
+        }
+
+        if (loggedInUser.getId() == userIdFrom && !(status.equals(RelationshipStatus.DELETED.toString())
+                || status.equals(RelationshipStatus.REQUEST_SENT.toString()))) {
+            throw new BadRequestException("User " + loggedInUser.getId() + " has not enough rights");
+        }
+
+        if (loggedInUser.getId() == userIdTo && !(status.equals(RelationshipStatus.FRIENDS.toString())
+                || status.equals(RelationshipStatus.REQUEST_DECLINED.toString()))) {
+            throw new BadRequestException("User " + loggedInUser.getId() + " has not enough rights");
+        }
     }
 
     private void validateRelationship(long userIdFrom, long userIdTo, String status, Relationship relationship) throws BadRequestException {
