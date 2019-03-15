@@ -4,6 +4,7 @@ import com.findme.dao.RelationshipDAO;
 import com.findme.dao.UserDAO;
 import com.findme.exception.BadRequestException;
 import com.findme.exception.InternalServerError;
+import com.findme.exception.UnauthorizedException;
 import com.findme.models.Relationship;
 import com.findme.models.RelationshipStatus;
 import com.findme.models.User;
@@ -58,7 +59,7 @@ public class RelationshipService {
     }
 
     public Relationship update(long userIdFrom, long userIdTo, String status, User loggedInUser)
-            throws InternalServerError, BadRequestException {
+            throws InternalServerError, BadRequestException, UnauthorizedException {
         validateUsersId(userIdFrom, userIdTo);
 
         Relationship relationship = relationshipDAO.getRelationshipByUsersId(userIdFrom, userIdTo);
@@ -70,21 +71,24 @@ public class RelationshipService {
         return relationshipDAO.update(relationship);
     }
 
-    private void validateLoggedInUser(User loggedInUser, long userIdFrom, long userIdTo, String status) throws BadRequestException {
+    private void validateLoggedInUser(User loggedInUser, long userIdFrom, long userIdTo, String status)
+            throws BadRequestException, UnauthorizedException {
         if (loggedInUser == null) {
-            throw new BadRequestException("User is not authorized");
+            throw new UnauthorizedException("User is not authorized");
         }
 
         if (loggedInUser.getId() == userIdTo || loggedInUser.getId() == userIdFrom) {
             return;
         }
 
-        if (loggedInUser.getId() == userIdFrom && (status.equals(RelationshipStatus.DELETED.toString())
+        if (loggedInUser.getId() == userIdFrom
+                && (status.equals(RelationshipStatus.DELETED.toString())
                 || status.equals(RelationshipStatus.REQUEST_SENT.toString()))) {
             return;
         }
 
-        if (loggedInUser.getId() == userIdTo && (status.equals(RelationshipStatus.FRIENDS.toString())
+        if (loggedInUser.getId() == userIdTo
+                && (status.equals(RelationshipStatus.FRIENDS.toString())
                 || status.equals(RelationshipStatus.REQUEST_DECLINED.toString()))) {
             return;
         }

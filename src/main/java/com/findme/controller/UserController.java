@@ -3,9 +3,11 @@ package com.findme.controller;
 import com.findme.exception.BadRequestException;
 import com.findme.exception.InternalServerError;
 import com.findme.exception.NotFoundException;
+import com.findme.exception.UnauthorizedException;
 import com.findme.models.User;
 import com.findme.service.RelationshipService;
 import com.findme.service.UserService;
+import com.findme.util.RequestJsonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,21 +16,23 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
-import java.util.Date;
-import java.util.List;
+import java.io.IOException;
+import java.util.*;
 
 @Controller
 public class UserController {
 
     private UserService userService;
     private RelationshipService relationshipService;
+    private RequestJsonUtil requestJsonUtil;
 
     private Long loginUserId;
 
     @Autowired
-    public UserController(UserService userService, RelationshipService relationshipService) {
+    public UserController(UserService userService, RelationshipService relationshipService, RequestJsonUtil requestJsonUtil) {
         this.userService = userService;
         this.relationshipService = relationshipService;
+        this.requestJsonUtil = requestJsonUtil;
     }
 
     @RequestMapping(path = "/user/{userId}", method = RequestMethod.GET)
@@ -111,32 +115,23 @@ public class UserController {
         try {
             User loggedInUser = (User) session.getAttribute("user");
 
-            if (loggedInUser == null || Long.parseLong(userId) != loggedInUser.getId()) {
-                throw new BadRequestException("User is not authorized");
+            if (loggedInUser == null) {
+                throw new UnauthorizedException("User is not authorized");
+            }
+
+            if (Long.parseLong(userId) != loggedInUser.getId()) {
+                throw new BadRequestException("User has not enough rights");
             }
 
             List<User> sentRequestsUsers = userService.getOutcomeRequests(Long.parseLong(userId));
 
-            StringBuilder usersJSON = new StringBuilder();
-            usersJSON.append("\"users\":[");
-
-            for(User user : sentRequestsUsers) {
-                usersJSON.append("{\"id\":\"")
-                        .append(user.getId())
-                        .append("\",\"firstName\":\"")
-                        .append(user.getFirstName()).append("\",\"lastName\":\"")
-                        .append(user.getLastName())
-                        .append("\"},");
-            }
-
-            usersJSON.deleteCharAt(usersJSON.length() - 1);
-            usersJSON.append("]");
-
-            return new ResponseEntity<>(usersJSON.toString(), HttpStatus.OK);
+            return new ResponseEntity<>(requestJsonUtil.getJsonFromList(sentRequestsUsers), HttpStatus.OK);
         } catch (IllegalStateException | BadRequestException | NumberFormatException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (InternalServerError e) {
+        } catch (InternalServerError | IOException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (UnauthorizedException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
     }
 
@@ -145,32 +140,23 @@ public class UserController {
         try {
             User loggedInUser = (User) session.getAttribute("user");
 
-            if (loggedInUser == null || Long.parseLong(userId) != loggedInUser.getId()) {
-                throw new BadRequestException("User is not authorized");
+            if (loggedInUser == null) {
+                throw new UnauthorizedException("User is not authorized");
+            }
+
+            if (Long.parseLong(userId) != loggedInUser.getId()) {
+                throw new BadRequestException("User has not enough rights");
             }
 
             List<User> receivedRequestsUsers = userService.getIncomeRequests(Long.parseLong(userId));
 
-            StringBuilder usersJSON = new StringBuilder();
-            usersJSON.append("\"users\" : [");
-
-            for(User user : receivedRequestsUsers) {
-                usersJSON.append("{ \"id\" : \"")
-                        .append(user.getId())
-                        .append("\", \"firstName\" : \"")
-                        .append(user.getFirstName()).append("\", \"lastName\" : \"")
-                        .append(user.getLastName())
-                .append("\"},");
-            }
-
-            usersJSON.deleteCharAt(usersJSON.length() - 1);
-            usersJSON.append("]");
-
-            return new ResponseEntity<>(usersJSON.toString(), HttpStatus.OK);
+            return new ResponseEntity<>(requestJsonUtil.getJsonFromList(receivedRequestsUsers), HttpStatus.OK);
         } catch (IllegalStateException | BadRequestException | NumberFormatException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (InternalServerError e) {
+        } catch (InternalServerError | IOException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (UnauthorizedException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
     }
 }

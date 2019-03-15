@@ -108,7 +108,7 @@
             success: function success(xhr) {
                 var incomeRequestsDiv = document.getElementById("incomeRequests");
 
-                var users = JSON.parse('{' + xhr.toString() + '}');
+                var users = JSON.parse(xhr.toString());
 
                 for (var i = 0; i < users.users.length; i++) {
                     var aloneRequestDiv = document.createElement("div");
@@ -146,7 +146,7 @@
             type: "GET",
             success: function success(xhr) {
                 var outcomeRequestsDiv = document.getElementById("outcomeRequests");
-                var users = JSON.parse('{' + xhr.toString() + '}');
+                var users = JSON.parse(xhr.toString());
 
                 for (var i = 0; i < users.users.length; i++) {
                     var aloneRequestDiv = document.createElement("div");
@@ -241,19 +241,6 @@
     }
 
     function acceptRequest() {
-        // $.ajax({
-        //     url: "/update-relationship?userIdTo=" + $('#loginUserId').text() + "&userIdFrom="
-        //     + this.id.replace('acceptButton', '')  + "&status=FRIENDS",
-        //     type: 'PUT',
-        //     success: function success(xhr) {
-        //         alert("success");
-        //     },
-        //     error: function error(xhr) {
-        //         alert(xhr.responseText);
-        //     }
-        // });
-        // return false;
-
         var url = "/update-relationship?userIdTo=" + $('#loginUserId').text() + "&userIdFrom="
             + this.id.replace('acceptButton', '') + "&status=FRIENDS";
 

@@ -2,7 +2,7 @@ package com.findme.controller;
 
 import com.findme.exception.BadRequestException;
 import com.findme.exception.InternalServerError;
-import com.findme.models.RelationshipStatus;
+import com.findme.exception.UnauthorizedException;
 import com.findme.models.User;
 import com.findme.service.RelationshipService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +32,7 @@ public class RelationshipController {
             User loggedInUser = (User) session.getAttribute("user");
 
             if (loggedInUser == null) {
-                throw new BadRequestException("User is not authorized");
+                throw new UnauthorizedException("User is not authorized");
             }
 
             if (Long.parseLong(userIdFrom) != loggedInUser.getId()) {
@@ -45,6 +45,8 @@ public class RelationshipController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (InternalServerError e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (UnauthorizedException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
     }
 
@@ -63,9 +65,8 @@ public class RelationshipController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (InternalServerError e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (UnauthorizedException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
     }
-
-
-
 }
