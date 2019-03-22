@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
+import java.math.BigInteger;
 
 @Repository
 @Transactional
@@ -15,8 +16,37 @@ public class RelationshipDAO extends GeneralDAO<Relationship> {
     private static final String GET_RELATIONSHIP_BY_USERS_ID
             = "SELECT * FROM RELATIONSHIP WHERE USER_FROM = :userIdFrom AND USER_TO = :userIdTo";
 
+    private static final String GET_USER_FRIENDS_COUNT
+            = "SELECT COUNT(*) FROM RELATIONSHIP " +
+            "WHERE (USER_FROM = :userId OR " +
+            "USER_TO = :userId) AND " +
+            "STATUS = 'FRIENDS'";
+
+    private static final String GET_OUTCOME_REQUESTS_COUNT
+            = "SELECT COUNT(*) FROM RELATIONSHIP " +
+            "WHERE USER_FROM = :userId AND " +
+            "STATUS = 'REQUEST_SENT'";
+
     public RelationshipDAO() {
         setTypeParameterOfClass(Relationship.class);
+    }
+
+    public int getUserFriendsCount(long userId) throws InternalServerError {
+        return getByUserId(userId, GET_USER_FRIENDS_COUNT);
+    }
+
+    public int getOutcomeRequestsCount(long userId) throws InternalServerError {
+        return getByUserId(userId, GET_OUTCOME_REQUESTS_COUNT);
+    }
+
+    private int getByUserId(long userId, String sqlRequest) throws InternalServerError {
+        try {
+            Query query = getEntityManager().createNativeQuery(sqlRequest);
+            query.setParameter("userId", userId);
+            return Integer.parseInt(query.getSingleResult().toString());
+        } catch (Exception e) {
+            throw new InternalServerError("Getting is failed");
+        }
     }
 
     public Relationship getRelationshipByUsersId(long userIdFrom, long userIdTo) throws InternalServerError {
@@ -25,11 +55,9 @@ public class RelationshipDAO extends GeneralDAO<Relationship> {
             query.setParameter("userIdFrom", userIdFrom);
             query.setParameter("userIdTo", userIdTo);
             return (Relationship) query.getSingleResult();
-        }catch (NoResultException e) {
+        } catch (NoResultException e) {
             return null;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-            e.printStackTrace();
             throw new InternalServerError("Getting is failed");
         }
     }

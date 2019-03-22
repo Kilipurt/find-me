@@ -2,6 +2,7 @@ package com.findme.models;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 @Entity
 @Table(name = "RELATIONSHIP")
@@ -9,6 +10,7 @@ public class Relationship implements Serializable {
     private String status;
     private User userFrom;
     private User userTo;
+    private Date lastStatusChange;
 
     @Id
     @OneToOne()
@@ -24,6 +26,16 @@ public class Relationship implements Serializable {
         return userTo;
     }
 
+    @Column(name = "STATUS")
+    public String getStatus() {
+        return status;
+    }
+
+    @Column(name = "LAST_STATUS_CHANGE")
+    public Date getLastStatusChange() {
+        return lastStatusChange;
+    }
+
     public void setUserFrom(User userFrom) {
         this.userFrom = userFrom;
     }
@@ -32,13 +44,12 @@ public class Relationship implements Serializable {
         this.userTo = userTo;
     }
 
-    @Column(name = "STATUS")
-    public String getStatus() {
-        return status;
-    }
-
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public void setLastStatusChange(Date lastStatusChange) {
+        this.lastStatusChange = lastStatusChange;
     }
 
     @Override

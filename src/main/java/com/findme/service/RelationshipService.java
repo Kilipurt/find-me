@@ -8,8 +8,14 @@ import com.findme.exception.UnauthorizedException;
 import com.findme.models.Relationship;
 import com.findme.models.RelationshipStatus;
 import com.findme.models.User;
+import com.findme.models.ValidationData;
+import com.findme.service.updateValidation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Service
 public class RelationshipService {
@@ -54,6 +60,7 @@ public class RelationshipService {
         newRelationship.setStatus(RelationshipStatus.REQUEST_SENT.toString());
         newRelationship.setUserFrom(userDAO.findById(userIdFrom));
         newRelationship.setUserTo(userTo);
+        newRelationship.setLastStatusChange(new Date());
 
         return relationshipDAO.save(newRelationship);
     }
@@ -64,67 +71,50 @@ public class RelationshipService {
 
         Relationship relationship = relationshipDAO.getRelationshipByUsersId(userIdFrom, userIdTo);
 
-        validateLoggedInUser(loggedInUser, userIdFrom, userIdTo, status);
-        validateRelationship(userIdFrom, userIdTo, status, relationship);
+        validateForUpdate(userIdFrom, userIdTo, status, loggedInUser, relationship);
 
         relationship.setStatus(RelationshipStatus.valueOf(status).toString());
+        relationship.setLastStatusChange(new Date());
+
         return relationshipDAO.update(relationship);
     }
 
-    private void validateLoggedInUser(User loggedInUser, long userIdFrom, long userIdTo, String status)
-            throws BadRequestException, UnauthorizedException {
-        if (loggedInUser == null) {
-            throw new UnauthorizedException("User is not authorized");
+    private void validateForUpdate(long userIdFrom, long userIdTo, String status, User loggedInUser, Relationship relationship)
+            throws InternalServerError, BadRequestException, UnauthorizedException {
+
+        ValidationData validationData = new ValidationData(userIdFrom, userIdTo, relationship, loggedInUser, status);
+
+        Criteria.setValidationData(validationData);
+        Criteria.setRelationshipDAO(relationshipDAO);
+
+        List<Criteria> validations = new ArrayList<>();
+
+        validations.add(new RelationshipStatusValidator());
+        validations.add(new LoggedInUserValidator());
+
+        if (RelationshipStatus.PAST_FRIENDS.toString().equals(status)) {
+            validations.add(new FriendshipTimeValidator());
         }
 
-        if (loggedInUser.getId() == userIdTo || loggedInUser.getId() == userIdFrom) {
-            return;
+        if (RelationshipStatus.FRIENDS.toString().equals(status)) {
+            validations.add(new MaxFriendsValidator());
         }
 
-        if (loggedInUser.getId() == userIdFrom
-                && (status.equals(RelationshipStatus.DELETED.toString())
-                || status.equals(RelationshipStatus.REQUEST_SENT.toString()))) {
-            return;
+        if (RelationshipStatus.REQUEST_SENT.toString().equals(status)) {
+            validations.add(new MaxOutcomeRequestValidator());
         }
 
-        if (loggedInUser.getId() == userIdTo
-                && (status.equals(RelationshipStatus.FRIENDS.toString())
-                || status.equals(RelationshipStatus.REQUEST_DECLINED.toString()))) {
-            return;
+        AndCriteria validationCriteria = new AndCriteria(validations);
+
+        try {
+            validationCriteria.validate();
+        } catch (UnauthorizedException e) {
+            throw new UnauthorizedException(e.getMessage());
+        } catch (BadRequestException e) {
+            throw new BadRequestException(e.getMessage());
+        } catch (Exception e) {
+            throw new InternalServerError(e.getMessage());
         }
-
-        throw new BadRequestException("User " + loggedInUser.getId() + " has not enough rights");
-    }
-
-    private void validateRelationship(long userIdFrom, long userIdTo, String status, Relationship relationship) throws BadRequestException {
-        if (relationship == null) {
-            throw new BadRequestException("Relationship between users "
-                    + userIdFrom + " and " + userIdTo + " is not exist");
-        }
-
-        if (relationship.getStatus().equals(RelationshipStatus.REQUEST_SENT.toString())
-                && (status.equals(RelationshipStatus.FRIENDS.toString())
-                || status.equals(RelationshipStatus.REQUEST_DECLINED.toString())
-                || status.equals(RelationshipStatus.DELETED.toString()))) {
-            return;
-        }
-
-        if (relationship.getStatus().equals(RelationshipStatus.FRIENDS.toString())
-                && status.equals(RelationshipStatus.PAST_FRIENDS.toString())) {
-            return;
-        }
-
-        if (relationship.getStatus().equals(RelationshipStatus.REQUEST_DECLINED.toString())
-                && status.equals(RelationshipStatus.REQUEST_SENT.toString())) {
-            return;
-        }
-
-        if (relationship.getStatus().equals(RelationshipStatus.PAST_FRIENDS.toString())
-                && status.equals(RelationshipStatus.REQUEST_SENT.toString())) {
-            return;
-        }
-
-        throw new BadRequestException("It's impossible to update relationship to the status " + status);
     }
 
     private void validateUsersId(long userIdFrom, long userIdTo) throws BadRequestException {
