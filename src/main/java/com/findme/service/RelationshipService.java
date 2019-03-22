@@ -54,7 +54,7 @@ public class RelationshipService {
             throw new BadRequestException("Relationship between users " + userIdFrom + " and " + userIdTo + " already exists");
         }
 
-        validateForSave();
+        validateForSave(userIdFrom);
 
         Relationship newRelationship = new Relationship();
         newRelationship.setStatus(RelationshipStatus.REQUEST_SENT.toString());
@@ -79,7 +79,13 @@ public class RelationshipService {
         return relationshipDAO.update(relationship);
     }
 
-    private void validateForSave() throws InternalServerError, BadRequestException {
+    private void validateForSave(long userIdFrom) throws InternalServerError, BadRequestException {
+        ValidationData validationData = new ValidationData();
+        validationData.setUserIdFrom(userIdFrom);
+
+        Criteria.setRelationshipDAO(relationshipDAO);
+        Criteria.setValidationData(validationData);
+
         AndCriteria andCriteria = new AndCriteria(Collections.singletonList(new MaxOutcomeRequestValidator()));
 
         try {
@@ -87,6 +93,7 @@ public class RelationshipService {
         } catch (BadRequestException e) {
             throw new BadRequestException(e.getMessage());
         } catch (Exception e) {
+            e.printStackTrace();
             throw new InternalServerError(e.getMessage());
         }
     }

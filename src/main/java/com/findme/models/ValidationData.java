@@ -47,6 +47,9 @@ public class ValidationData {
         this.status = status;
     }
 
+    public ValidationData() {
+    }
+
     public ValidationData(long userIdFrom, long userIdTo, Relationship relationship, User loggedInUser, String status) {
         this.userIdFrom = userIdFrom;
         this.userIdTo = userIdTo;
