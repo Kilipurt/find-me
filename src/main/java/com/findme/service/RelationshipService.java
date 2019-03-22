@@ -13,9 +13,7 @@ import com.findme.service.updateValidation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class RelationshipService {
@@ -56,6 +54,8 @@ public class RelationshipService {
             throw new BadRequestException("Relationship between users " + userIdFrom + " and " + userIdTo + " already exists");
         }
 
+        validateForSave();
+
         Relationship newRelationship = new Relationship();
         newRelationship.setStatus(RelationshipStatus.REQUEST_SENT.toString());
         newRelationship.setUserFrom(userDAO.findById(userIdFrom));
@@ -77,6 +77,18 @@ public class RelationshipService {
         relationship.setLastStatusChange(new Date());
 
         return relationshipDAO.update(relationship);
+    }
+
+    private void validateForSave() throws InternalServerError, BadRequestException {
+        AndCriteria andCriteria = new AndCriteria(Collections.singletonList(new MaxOutcomeRequestValidator()));
+
+        try {
+            andCriteria.validate();
+        } catch (BadRequestException e) {
+            throw new BadRequestException(e.getMessage());
+        } catch (Exception e) {
+            throw new InternalServerError(e.getMessage());
+        }
     }
 
     private void validateForUpdate(long userIdFrom, long userIdTo, String status, User loggedInUser, Relationship relationship)
@@ -104,10 +116,10 @@ public class RelationshipService {
             validations.add(new MaxOutcomeRequestValidator());
         }
 
-        AndCriteria validationCriteria = new AndCriteria(validations);
+        AndCriteria andCriteria = new AndCriteria(validations);
 
         try {
-            validationCriteria.validate();
+            andCriteria.validate();
         } catch (UnauthorizedException e) {
             throw new UnauthorizedException(e.getMessage());
         } catch (BadRequestException e) {
