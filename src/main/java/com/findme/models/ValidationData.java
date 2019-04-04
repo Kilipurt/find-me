@@ -6,6 +6,9 @@ public class ValidationData {
     private Relationship relationship;
     private User loggedInUser;
     private String status;
+    private int userFromFriendsCount;
+    private int userToFriendsCount;
+    private int outcomeRequestsCount;
 
     public long getUserIdFrom() {
         return userIdFrom;
@@ -25,6 +28,18 @@ public class ValidationData {
 
     public String getStatus() {
         return status;
+    }
+
+    public int getUserFromFriendsCount() {
+        return userFromFriendsCount;
+    }
+
+    public int getUserToFriendsCount() {
+        return userToFriendsCount;
+    }
+
+    public int getOutcomeRequestsCount() {
+        return outcomeRequestsCount;
     }
 
     public void setUserIdFrom(long userIdFrom) {
@@ -47,14 +62,15 @@ public class ValidationData {
         this.status = status;
     }
 
-    public ValidationData() {
+    public void setUserFromFriendsCount(int userFromFriendsCount) {
+        this.userFromFriendsCount = userFromFriendsCount;
     }
 
-    public ValidationData(long userIdFrom, long userIdTo, Relationship relationship, User loggedInUser, String status) {
-        this.userIdFrom = userIdFrom;
-        this.userIdTo = userIdTo;
-        this.relationship = relationship;
-        this.loggedInUser = loggedInUser;
-        this.status = status;
+    public void setUserToFriendsCount(int userToFriendsCount) {
+        this.userToFriendsCount = userToFriendsCount;
+    }
+
+    public void setOutcomeRequestsCount(int outcomeRequestsCount) {
+        this.outcomeRequestsCount = outcomeRequestsCount;
     }
 }

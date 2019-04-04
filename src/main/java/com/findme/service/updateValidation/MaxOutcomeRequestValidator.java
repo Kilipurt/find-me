@@ -1,16 +1,17 @@
 package com.findme.service.updateValidation;
 
 import com.findme.exception.BadRequestException;
-import com.findme.exception.InternalServerError;
+import com.findme.models.ValidationData;
 
-public class MaxOutcomeRequestValidator extends Criteria {
+public class MaxOutcomeRequestValidator extends GeneralValidator {
 
     @Override
-    public void validate() throws InternalServerError, BadRequestException {
-        int outcomeRequestsCount = getRelationshipDAO().getOutcomeRequestsCount(getValidationData().getUserIdFrom());
+    public void validate(ValidationData validationData) throws Exception {
 
-        if (outcomeRequestsCount == 10) {
+        if (validationData.getOutcomeRequestsCount() == 10) {
             throw new BadRequestException("You can send only 10 friend requests");
         }
+
+        validateNext(validationData);
     }
 }

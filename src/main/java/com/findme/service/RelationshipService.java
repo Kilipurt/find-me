@@ -83,13 +83,10 @@ public class RelationshipService {
         ValidationData validationData = new ValidationData();
         validationData.setUserIdFrom(userIdFrom);
 
-        Criteria.setRelationshipDAO(relationshipDAO);
-        Criteria.setValidationData(validationData);
-
-        AndCriteria andCriteria = new AndCriteria(Collections.singletonList(new MaxOutcomeRequestValidator()));
+        GeneralValidator maxFriendsValidator = new MaxFriendsValidator();
 
         try {
-            andCriteria.validate();
+            maxFriendsValidator.validate(validationData);
         } catch (BadRequestException e) {
             throw new BadRequestException(e.getMessage());
         } catch (Exception e) {
@@ -101,32 +98,34 @@ public class RelationshipService {
     private void validateForUpdate(long userIdFrom, long userIdTo, String status, User loggedInUser, Relationship relationship)
             throws InternalServerError, BadRequestException, UnauthorizedException {
 
-        ValidationData validationData = new ValidationData(userIdFrom, userIdTo, relationship, loggedInUser, status);
+        ValidationData validationData = new ValidationData();
+        validationData.setUserIdFrom(userIdFrom);
+        validationData.setUserIdTo(userIdTo);
+        validationData.setRelationship(relationship);
+        validationData.setLoggedInUser(loggedInUser);
+        validationData.setStatus(status);
+        validationData.setUserFromFriendsCount(relationshipDAO.getUserFriendsCount(userIdFrom));
+        validationData.setUserToFriendsCount(relationshipDAO.getUserFriendsCount(userIdTo));
+        validationData.setOutcomeRequestsCount(relationshipDAO.getOutcomeRequestsCount(userIdFrom));
 
-        Criteria.setValidationData(validationData);
-        Criteria.setRelationshipDAO(relationshipDAO);
-
-        List<Criteria> validations = new ArrayList<>();
-
-        validations.add(new RelationshipStatusValidator());
-        validations.add(new LoggedInUserValidator());
+        GeneralValidator relationshipStatusValidator = new RelationshipStatusValidator();
+        GeneralValidator loggedInUserValidator = new LoggedInUserValidator();
+        relationshipStatusValidator.linkWith(loggedInUserValidator);
 
         if (RelationshipStatus.PAST_FRIENDS.toString().equals(status)) {
-            validations.add(new FriendshipTimeValidator());
+            loggedInUserValidator.linkWith(new FriendshipTimeValidator());
         }
 
         if (RelationshipStatus.FRIENDS.toString().equals(status)) {
-            validations.add(new MaxFriendsValidator());
+            loggedInUserValidator.linkWith(new MaxFriendsValidator());
         }
 
         if (RelationshipStatus.REQUEST_SENT.toString().equals(status)) {
-            validations.add(new MaxOutcomeRequestValidator());
+            loggedInUserValidator.linkWith(new MaxOutcomeRequestValidator());
         }
 
-        AndCriteria andCriteria = new AndCriteria(validations);
-
         try {
-            andCriteria.validate();
+            relationshipStatusValidator.validate(validationData);
         } catch (UnauthorizedException e) {
             throw new UnauthorizedException(e.getMessage());
         } catch (BadRequestException e) {
