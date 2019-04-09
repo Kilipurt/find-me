@@ -50,17 +50,19 @@ public class RelationshipService {
             throw new BadRequestException("User who receives friend request does not exist");
         }
 
-        if (relationshipDAO.getRelationshipByUsersId(userIdFrom, userIdTo) != null) {
+        Relationship relationship = relationshipDAO.getRelationshipByUsersId(userIdFrom, userIdTo);
+
+        if (relationship != null) {
             throw new BadRequestException("Relationship between users " + userIdFrom + " and " + userIdTo + " already exists");
         }
-
-        validateForSave(userIdFrom);
 
         Relationship newRelationship = new Relationship();
         newRelationship.setStatus(RelationshipStatus.REQUEST_SENT.toString());
         newRelationship.setUserFrom(userDAO.findById(userIdFrom));
         newRelationship.setUserTo(userTo);
         newRelationship.setLastStatusChange(new Date());
+
+        validateForSave(newRelationship);
 
         return relationshipDAO.save(newRelationship);
     }
@@ -71,7 +73,7 @@ public class RelationshipService {
 
         Relationship relationship = relationshipDAO.getRelationshipByUsersId(userIdFrom, userIdTo);
 
-        validateForUpdate(userIdFrom, userIdTo, status, loggedInUser, relationship);
+        validateForUpdate(status, loggedInUser, relationship);
 
         relationship.setStatus(RelationshipStatus.valueOf(status).toString());
         relationship.setLastStatusChange(new Date());
@@ -79,9 +81,9 @@ public class RelationshipService {
         return relationshipDAO.update(relationship);
     }
 
-    private void validateForSave(long userIdFrom) throws InternalServerError, BadRequestException {
+    private void validateForSave(Relationship relationship) throws InternalServerError, BadRequestException {
         ValidationData validationData = new ValidationData();
-        validationData.setUserIdFrom(userIdFrom);
+        validationData.setRelationship(relationship);
 
         GeneralValidator maxFriendsValidator = new MaxFriendsValidator();
 
@@ -95,12 +97,13 @@ public class RelationshipService {
         }
     }
 
-    private void validateForUpdate(long userIdFrom, long userIdTo, String status, User loggedInUser, Relationship relationship)
+    private void validateForUpdate(String status, User loggedInUser, Relationship relationship)
             throws InternalServerError, BadRequestException, UnauthorizedException {
 
+        long userIdFrom = relationship.getUserFrom().getId();
+        long userIdTo = relationship.getUserTo().getId();
+
         ValidationData validationData = new ValidationData();
-        validationData.setUserIdFrom(userIdFrom);
-        validationData.setUserIdTo(userIdTo);
         validationData.setRelationship(relationship);
         validationData.setLoggedInUser(loggedInUser);
         validationData.setStatus(status);
@@ -109,20 +112,10 @@ public class RelationshipService {
         validationData.setOutcomeRequestsCount(relationshipDAO.getOutcomeRequestsCount(userIdFrom));
 
         GeneralValidator relationshipStatusValidator = new RelationshipStatusValidator();
-        GeneralValidator loggedInUserValidator = new LoggedInUserValidator();
-        relationshipStatusValidator.linkWith(loggedInUserValidator);
-
-        if (RelationshipStatus.PAST_FRIENDS.toString().equals(status)) {
-            loggedInUserValidator.linkWith(new FriendshipTimeValidator());
-        }
-
-        if (RelationshipStatus.FRIENDS.toString().equals(status)) {
-            loggedInUserValidator.linkWith(new MaxFriendsValidator());
-        }
-
-        if (RelationshipStatus.REQUEST_SENT.toString().equals(status)) {
-            loggedInUserValidator.linkWith(new MaxOutcomeRequestValidator());
-        }
+        relationshipStatusValidator.linkWith(new LoggedInUserValidator()
+                .linkWith(new FriendshipTimeValidator()
+                        .linkWith(new MaxFriendsValidator()
+                                .linkWith(new MaxOutcomeRequestValidator()))));
 
         try {
             relationshipStatusValidator.validate(validationData);

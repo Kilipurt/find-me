@@ -7,30 +7,35 @@ import com.findme.models.ValidationData;
 public class RelationshipStatusValidator extends GeneralValidator {
 
     public void validate(ValidationData validationData) throws Exception {
+        String status = validationData.getStatus();
+        String oldStatus = validationData.getRelationship().getStatus();
+        long userIdFrom = validationData.getRelationship().getUserFrom().getId();
+        long userIdTo = validationData.getRelationship().getUserTo().getId();
+
         if (validationData.getRelationship() == null) {
             throw new BadRequestException("Relationship between users "
-                    + validationData.getUserIdFrom() + " and " + validationData.getUserIdTo() + " is not exist");
+                    + userIdFrom + " and " + userIdTo + " is not exist");
         }
 
-        if (validationData.getRelationship().getStatus().equals(RelationshipStatus.REQUEST_SENT.toString())
-                && (validationData.getStatus().equals(RelationshipStatus.FRIENDS.toString())
-                || validationData.getStatus().equals(RelationshipStatus.REQUEST_DECLINED.toString())
-                || validationData.getStatus().equals(RelationshipStatus.DELETED.toString()))) {
+        if (oldStatus.equals(RelationshipStatus.REQUEST_SENT.toString())
+                && (status.equals(RelationshipStatus.FRIENDS.toString())
+                || status.equals(RelationshipStatus.REQUEST_DECLINED.toString())
+                || status.equals(RelationshipStatus.DELETED.toString()))) {
             validateNext(validationData);
         }
 
-        if (validationData.getRelationship().getStatus().equals(RelationshipStatus.FRIENDS.toString())
-                && validationData.getStatus().equals(RelationshipStatus.PAST_FRIENDS.toString())) {
+        if (oldStatus.equals(RelationshipStatus.FRIENDS.toString())
+                && status.equals(RelationshipStatus.PAST_FRIENDS.toString())) {
             validateNext(validationData);
         }
 
-        if (validationData.getRelationship().getStatus().equals(RelationshipStatus.REQUEST_DECLINED.toString())
-                && validationData.getStatus().equals(RelationshipStatus.REQUEST_SENT.toString())) {
+        if (oldStatus.equals(RelationshipStatus.REQUEST_DECLINED.toString())
+                && status.equals(RelationshipStatus.REQUEST_SENT.toString())) {
             validateNext(validationData);
         }
 
-        if (validationData.getRelationship().getStatus().equals(RelationshipStatus.PAST_FRIENDS.toString())
-                && validationData.getStatus().equals(RelationshipStatus.REQUEST_SENT.toString())) {
+        if (oldStatus.equals(RelationshipStatus.PAST_FRIENDS.toString())
+                && status.equals(RelationshipStatus.REQUEST_SENT.toString())) {
             validateNext(validationData);
         }
 

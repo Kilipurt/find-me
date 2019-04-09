@@ -1,22 +1,12 @@
 package com.findme.models;
 
 public class ValidationData {
-    private long userIdFrom;
-    private long userIdTo;
     private Relationship relationship;
     private User loggedInUser;
     private String status;
     private int userFromFriendsCount;
     private int userToFriendsCount;
     private int outcomeRequestsCount;
-
-    public long getUserIdFrom() {
-        return userIdFrom;
-    }
-
-    public long getUserIdTo() {
-        return userIdTo;
-    }
 
     public Relationship getRelationship() {
         return relationship;
@@ -40,14 +30,6 @@ public class ValidationData {
 
     public int getOutcomeRequestsCount() {
         return outcomeRequestsCount;
-    }
-
-    public void setUserIdFrom(long userIdFrom) {
-        this.userIdFrom = userIdFrom;
-    }
-
-    public void setUserIdTo(long userIdTo) {
-        this.userIdTo = userIdTo;
     }
 
     public void setRelationship(Relationship relationship) {
