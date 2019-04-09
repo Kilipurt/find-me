@@ -59,6 +59,11 @@ public class RelationshipController {
     ) {
         try {
             User loggedInUser = (User) session.getAttribute("user");
+
+            if (loggedInUser == null) {
+                throw new UnauthorizedException("User is not authorized");
+            }
+
             relationshipService.update(Long.parseLong(userIdFrom), Long.parseLong(userIdTo), status, loggedInUser);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (IllegalStateException | BadRequestException | NumberFormatException e) {

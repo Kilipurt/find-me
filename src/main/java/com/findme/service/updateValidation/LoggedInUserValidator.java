@@ -1,7 +1,6 @@
 package com.findme.service.updateValidation;
 
 import com.findme.exception.BadRequestException;
-import com.findme.exception.UnauthorizedException;
 import com.findme.models.RelationshipStatus;
 import com.findme.models.ValidationData;
 
@@ -12,10 +11,6 @@ public class LoggedInUserValidator extends GeneralValidator {
         long userIdFrom = validationData.getRelationship().getUserFrom().getId();
         long loggedInUserId = validationData.getLoggedInUser().getId();
         String status = validationData.getStatus();
-
-        if (validationData.getLoggedInUser() == null) {
-            throw new UnauthorizedException("User is not authorized");
-        }
 
         if (loggedInUserId == userIdTo || loggedInUserId == userIdFrom) {
             validateNext(validationData);
