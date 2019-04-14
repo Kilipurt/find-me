@@ -34,6 +34,21 @@
         <p class="loginUserId" id="loginUserId" th:text="${loginUserId}"></p>
     </div>
 
+    <div class="post-div">
+        <form id="post-form">
+            <p>Message</p>
+            <input id="postMessage" name="postMessage" type="text"/>
+
+            <p>Tagged users</p>
+            <input id="taggedUsers" name="taggedUsers" type="text"/>
+
+            <p>Location</p>
+            <input id="location" name="location" type="text"/>
+
+            <button type="submit">Create</button>
+        </form>
+    </div>
+
     <div class="relationship-status" id="relationship-status">
         <p id="status-field" th:text="${relationshipStatus}"></p>
     </div>
@@ -260,5 +275,26 @@
         });
         return false;
     }
+
+    $("#post-form").submit(function (e) {
+        $.ajax({
+            url: "/add-post",
+            type: "POST",
+            data: {
+                message: document.getElementById("postMessage").value,
+                usersTagged: document.getElementById("taggedUsers").value,
+                userPosted: $('#loginUserId').text(),
+                userPagePosted: $('#userId').text(),
+                location: document.getElementById("location").value
+            },
+            // success: function success(xhr) {
+            //     alert(xhr);
+            // },
+            error: function error(xhr) {
+                alert(xhr.responseText);
+            }
+        });
+        return false;
+    });
 </script>
 </html>
