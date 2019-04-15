@@ -206,4 +206,33 @@ public class PostController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
     }
+
+    @RequestMapping(path = "/delete-post", method = RequestMethod.DELETE)
+    public ResponseEntity<String> deletePost(
+            HttpSession session,
+            @RequestParam(value = "postId") String postId,
+            @RequestParam(value = "userPostedId") String userPostedId
+    ) {
+        try {
+            User loggedInUser = (User) session.getAttribute("user");
+
+            if (loggedInUser == null) {
+                throw new UnauthorizedException("User is not authorized");
+            }
+
+            if (!loggedInUser.getId().equals(Long.parseLong(userPostedId))) {
+                throw new BadRequestException("Logged in user does not have enough rights");
+            }
+
+            postService.delete(Long.parseLong(postId));
+
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (InternalServerError e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (BadRequestException | NumberFormatException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (UnauthorizedException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
+    }
 }
