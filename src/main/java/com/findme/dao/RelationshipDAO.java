@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
-import java.math.BigInteger;
 
 @Repository
 @Transactional
@@ -15,6 +14,12 @@ public class RelationshipDAO extends GeneralDAO<Relationship> {
 
     private static final String GET_RELATIONSHIP_BY_USERS_ID
             = "SELECT * FROM RELATIONSHIP WHERE USER_FROM = :userIdFrom AND USER_TO = :userIdTo";
+
+    private static final String GET_FRIENDS_RELATIONSHIP_BY_USERS_ID
+            = "SELECT * FROM RELATIONSHIP " +
+            "WHERE (USER_FROM = :firstUserId AND USER_TO = :secondUserId) " +
+            "OR (USER_FROM = :secondUserId AND USER_TO = :firstUserId) " +
+            "AND STATUS ='FRIENDS'";
 
     private static final String GET_USER_FRIENDS_COUNT
             = "SELECT COUNT(*) FROM RELATIONSHIP " +
@@ -57,6 +62,22 @@ public class RelationshipDAO extends GeneralDAO<Relationship> {
             return (Relationship) query.getSingleResult();
         } catch (NoResultException e) {
             return null;
+        } catch (Exception e) {
+            throw new InternalServerError("Getting is failed");
+        }
+    }
+
+    public Relationship getFriendRelationshipByUsersId(long firstUserId, long secondUserId) throws InternalServerError {
+        try {
+            Query query = getEntityManager().createNativeQuery(GET_FRIENDS_RELATIONSHIP_BY_USERS_ID, Relationship.class);
+            query.setParameter("firstUserId", firstUserId);
+            query.setParameter("secondUserId", secondUserId);
+
+            if (query.getResultList().size() == 0) {
+                return null;
+            }
+
+            return (Relationship) query.getResultList().get(0);
         } catch (Exception e) {
             throw new InternalServerError("Getting is failed");
         }

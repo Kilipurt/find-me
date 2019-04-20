@@ -24,6 +24,24 @@ public class PostService {
         this.relationshipDAO = relationshipDAO;
     }
 
+    public List<Post> getPostsByFilter(PostFilter postFilter)
+            throws InternalServerError, BadRequestException {
+
+        if (postFilter.getType().equals(PostsFiltrationType.BY_FRIENDS)) {
+            return getPostsByFriends(postFilter.getLoggedInUserId(), postFilter.getUserPagePostedId());
+        }
+
+        if (postFilter.getType().equals(PostsFiltrationType.BY_PAGE_OWNER)) {
+            return getPostsByPageOwner(postFilter.getUserPostedId());
+        }
+
+        if (postFilter.getType().equals(PostsFiltrationType.BY_USER)) {
+            return getPostsByUserPosted(postFilter.getUserPostedId(), postFilter.getUserPagePostedId());
+        }
+
+        return getPostByPage(postFilter.getUserPagePostedId());
+    }
+
     public List<Post> getPostByPage(long userPagePostedId) throws InternalServerError, BadRequestException {
         if (userPagePostedId <= 0) {
             throw new BadRequestException("Wrong id " + userPagePostedId);
@@ -39,10 +57,6 @@ public class PostService {
     public List<Post> getPostsByFriends(long loggedInUserId, long userPagePostedId) throws InternalServerError, BadRequestException {
         if (userPagePostedId <= 0) {
             throw new BadRequestException("Wrong id " + userPagePostedId);
-        }
-
-        if (loggedInUserId <= 0) {
-            throw new BadRequestException("Wrong id " + loggedInUserId);
         }
 
         List<Post> posts = postDAO.getPostsByFriends(loggedInUserId, userPagePostedId);
@@ -83,14 +97,15 @@ public class PostService {
     }
 
     public Post update(Post post) throws InternalServerError, BadRequestException {
-        validateForUpdate(post);
+        if (post.getId() == null || findById(post.getId()) == null) {
+            throw new BadRequestException("Post was not found");
+        }
 
-        Post postForUpdating = findById(post.getId());
-        post.setMessage(post.getMessage());
-        post.setUsersTagged(post.getUsersTagged());
-        post.setLocation(post.getLocation());
+        if (post.getMessage().length() > 200) {
+            throw new BadRequestException("Max length for post is 200 characters");
+        }
 
-        return postDAO.update(postForUpdating);
+        return postDAO.update(post);
     }
 
     public void delete(long id) throws InternalServerError, BadRequestException {
@@ -109,25 +124,7 @@ public class PostService {
         return postDAO.findById(id);
     }
 
-    private void validateForUpdate(Post post) throws BadRequestException, InternalServerError {
-        if (post == null) {
-            throw new BadRequestException("Post was not created");
-        }
-
-        if (post.getId() == null || findById(post.getId()) == null) {
-            throw new BadRequestException("Post was not found");
-        }
-
-        if (post.getMessage().length() > 200) {
-            throw new BadRequestException("Max length for post is 200 characters");
-        }
-    }
-
     private void validateForSave(Post post) throws BadRequestException, InternalServerError {
-        if (post == null) {
-            throw new BadRequestException("Post was not created");
-        }
-
         if (post.getMessage().length() > 200) {
             throw new BadRequestException("Max length for post is 200 characters");
         }
@@ -137,11 +134,10 @@ public class PostService {
 
         if (firstUserId != secondUserId) {
 
-            Relationship relationship = relationshipDAO.getRelationshipByUsersId(firstUserId, secondUserId);
-            relationship = relationship == null ? relationshipDAO.getRelationshipByUsersId(secondUserId, firstUserId) : relationship;
+            Relationship relationship = relationshipDAO.getFriendRelationshipByUsersId(firstUserId, secondUserId);
 
-            if (relationship == null || !relationship.getStatus().equals(RelationshipStatus.FRIENDS.toString())) {
-                throw new BadRequestException("User can not write post in not friend user's page");
+            if (relationship == null) {
+                throw new BadRequestException("User can not write post on not friend user's page");
             }
         }
     }

@@ -1,10 +1,6 @@
 package com.findme.util;
 
-import com.findme.exception.BadRequestException;
-import com.findme.exception.InternalServerError;
 import com.findme.models.User;
-import com.findme.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -14,13 +10,6 @@ import java.util.Map;
 
 @Component
 public class UserParserUtil {
-
-    private UserService userService;
-
-    @Autowired
-    public UserParserUtil(UserService userService) {
-        this.userService = userService;
-    }
 
     public List<Map<String, Object>> usersListToMapUsersList(List<User> users) {
         List<Map<String, Object>> usersMapInList = new ArrayList<>();
@@ -40,14 +29,14 @@ public class UserParserUtil {
         return userMap;
     }
 
-    public List<User> parseUsersFromString(String usersTagged) throws BadRequestException, InternalServerError {
-        String[] usersTaggedStringArray = usersTagged.split(", ");
-        List<User> usersTaggedList = new ArrayList<>();
-
-        for (String userTaggedId : usersTaggedStringArray) {
-            usersTaggedList.add(userService.findById(Long.parseLong(userTaggedId)));
-        }
-
-        return usersTaggedList;
-    }
+//    public List<User> parseUsersFromString(String usersTagged) throws BadRequestException, InternalServerError {
+//        String[] usersTaggedStringArray = usersTagged.split(", ");
+//        List<User> usersTaggedList = new ArrayList<>();
+//
+//        for (String userTaggedId : usersTaggedStringArray) {
+//            usersTaggedList.add(userService.findById(Long.parseLong(userTaggedId)));
+//        }
+//
+//        return usersTaggedList;
+//    }
 }

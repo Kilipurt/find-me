@@ -29,14 +29,6 @@ public class PostJsonUtil {
             postMap.put("id", post.getId());
             postMap.put("message", post.getMessage());
             postMap.put("datePosted", post.getDatePosted());
-
-//            Map<String, Object> userMap = new HashMap<>();
-//            userMap.put("id", post.getUserPosted().getId());
-//            userMap.put("firstName", post.getUserPosted().getFirstName());
-//            userMap.put("lastName", post.getUserPosted().getLastName());
-//
-//            postMap.put("userPosted", userMap);
-
             postMap.put("userPosted", userParserUtil.createUserMap(post.getUserPosted()));
             postMap.put("location", post.getLocation());
             postMap.put("usersTagged", getUsersMapFromList(post.getUsersTagged()));
@@ -49,17 +41,6 @@ public class PostJsonUtil {
 
     private Map<String, Object> getUsersMapFromList(List<User> users) {
         Map<String, Object> usersMap = new HashMap<>();
-//        List<Map<String, Object>> usersMapInList = new ArrayList<>();
-//
-//        for (User user : users) {
-//            Map<String, Object> userMap = new HashMap<>();
-//            userMap.put("id", user.getId());
-//            userMap.put("firstName", user.getFirstName());
-//            userMap.put("lastName", user.getLastName());
-//            usersMapInList.add(userMap);
-//        }
-//
-//        usersMap.put("users", usersMapInList);
         usersMap.put("users", userParserUtil.usersListToMapUsersList(users));
         return usersMap;
     }

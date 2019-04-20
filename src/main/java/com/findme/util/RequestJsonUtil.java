@@ -23,18 +23,6 @@ public class RequestJsonUtil {
 
     public String getJsonFromList(List<User> users) throws IOException {
         Map<String, Object> incomeRequestsMap = new HashMap<>();
-//        List<Map<String, Object>> requests = new ArrayList<>();
-//
-//        for (User user : users) {
-//            Map<String, Object> userMap = new HashMap<>();
-//            userMap.put("id", user.getId());
-//            userMap.put("firstName", user.getFirstName());
-//            userMap.put("lastName", user.getLastName());
-//            requests.add(userMap);
-//        }
-//
-//        incomeRequestsMap.put("users", requests);
-
         incomeRequestsMap.put("users", userParserUtil.usersListToMapUsersList(users));
         return createObjectMapper().writeValueAsString(incomeRequestsMap);
     }
