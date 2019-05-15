@@ -12,10 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
@@ -31,6 +29,52 @@ public class PostController {
     public PostController(PostService postService, PostJsonUtil postJsonUtil) {
         this.postService = postService;
         this.postJsonUtil = postJsonUtil;
+    }
+
+    @RequestMapping(path = "/feed/{loggedInUserId}", method = RequestMethod.GET)
+    public String getFeed(Model model, HttpSession session, @PathVariable() String loggedInUserId) {
+        try {
+            User loggedInUser = (User) session.getAttribute("user");
+
+            if (loggedInUser == null) {
+                throw new UnauthorizedException("User is not authorized");
+            }
+
+            if (loggedInUser.getId() != Long.parseLong(loggedInUserId)) {
+                throw new BadRequestException("User does not have enough rights");
+            }
+
+            return "feed";
+        } catch (UnauthorizedException e) {
+            model.addAttribute("exception", e);
+            return "unauthorizedException";
+        } catch (BadRequestException | NumberFormatException e) {
+            model.addAttribute("exception", e);
+            return "badRequestException";
+        }
+    }
+
+    @RequestMapping(path = "/load", method = RequestMethod.GET)
+    public ResponseEntity<String> getFeed(
+            HttpSession session,
+            @RequestParam(value = "offset") String offset
+    ) {
+        try {
+            User loggedInUser = (User) session.getAttribute("user");
+
+            if (loggedInUser == null) {
+                throw new UnauthorizedException("User is not authorized");
+            }
+
+            List<Post> posts = postService.getFriendsPostsWithOffset(loggedInUser.getId(), Long.parseLong(offset));
+            return new ResponseEntity<>(postJsonUtil.getJsonFromList(posts), HttpStatus.OK);
+        } catch (InternalServerError | IOException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (UnauthorizedException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        } catch (BadRequestException | NumberFormatException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @RequestMapping(path = "/add-post", method = RequestMethod.POST)

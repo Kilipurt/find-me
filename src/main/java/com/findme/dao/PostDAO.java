@@ -5,7 +5,9 @@ import com.findme.models.Post;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -39,8 +41,38 @@ public class PostDAO extends GeneralDAO<Post> {
             "WHERE R.USER_FROM = :loggedInUserId " +
             "AND R.STATUS = 'FRIENDS')";
 
+    private static final String OLDER_FRIENDS_POST
+            = "SELECT TMP.ID, TMP.MESSAGE, TMP.DATE_POSTED, TMP.USER_POSTED, TMP.USER_PAGE_POSTED, TMP.LOCATION " +
+            "FROM (SELECT TMP.*, ROWNUM AS RNUM " +
+            "FROM(SELECT * FROM POST P " +
+            "WHERE P.USER_PAGE_POSTED = P.USER_POSTED " +
+            "AND P.USER_POSTED IN " +
+            "(SELECT R.USER_FROM FROM RELATIONSHIP R " +
+            "WHERE R.USER_TO = :loggedInUserId " +
+            "AND R.STATUS = 'FRIENDS') " +
+            "OR P.USER_POSTED IN " +
+            "(SELECT R.USER_TO FROM RELATIONSHIP R " +
+            "WHERE R.USER_FROM = :loggedInUserId " +
+            "AND R.STATUS = 'FRIENDS') " +
+            "ORDER BY P.DATE_POSTED DESC) TMP " +
+            "WHERE ROWNUM <= :postsNumber) TMP " +
+            "WHERE RNUM > :offset";
+
     public PostDAO() {
         setTypeParameterOfClass(Post.class);
+    }
+
+    public List<Post> getFriendsPostWithOffset(long loggedInUserId, long offset) throws InternalServerError {
+        try {
+            Query query = getEntityManager().createNativeQuery(OLDER_FRIENDS_POST, Post.class);
+            query.setParameter("loggedInUserId", loggedInUserId);
+            query.setParameter("offset", offset);
+            query.setParameter("postsNumber", offset + 50);
+
+            return query.getResultList();
+        } catch (Exception e) {
+            throw new InternalServerError("Getting is failed");
+        }
     }
 
     public List<Post> getPostsByPage(long userPagePostedId) throws InternalServerError {

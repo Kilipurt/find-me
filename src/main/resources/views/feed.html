@@ -1,0 +1,62 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Find me</title>
+</head>
+<body>
+
+<div id="posts">
+
+</div>
+
+<button type="submit" onclick="load()">Load more</button>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+</body>
+
+<script>
+    var loadNumber = 0;
+
+    $(document).ready(function (e) {
+        load();
+    });
+
+    function load() {
+        $.ajax({
+            url: "/load",
+            type: "GET",
+            data: {
+                offset: loadNumber
+            },
+            success: function success(xhr) {
+                write(xhr);
+            },
+            error: function error(xhr) {
+                alert(xhr.responseText);
+            }
+        });
+
+        return false;
+    }
+
+    function write(postsJson) {
+        debugger;
+        var postsDiv = document.getElementById("posts");
+
+        var posts = JSON.parse(postsJson.toString());
+
+        for (var i = 0; i < posts.posts.length; i++) {
+            var postDiv = document.createElement("div");
+
+            postDiv.insertAdjacentHTML("beforeEnd", posts.posts[i].message);
+            postsDiv.insertAdjacentElement("beforeEnd", postDiv);
+
+            loadNumber++;
+        }
+    }
+
+
+</script>
+
+</html>
