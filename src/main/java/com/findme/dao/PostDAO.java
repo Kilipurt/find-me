@@ -42,9 +42,7 @@ public class PostDAO extends GeneralDAO<Post> {
             "AND R.STATUS = 'FRIENDS')";
 
     private static final String OLDER_FRIENDS_POST
-            = "SELECT TMP.ID, TMP.MESSAGE, TMP.DATE_POSTED, TMP.USER_POSTED, TMP.USER_PAGE_POSTED, TMP.LOCATION " +
-            "FROM (SELECT TMP.*, ROWNUM AS RNUM " +
-            "FROM(SELECT * FROM POST P " +
+            = "SELECT * FROM POST P " +
             "WHERE P.USER_PAGE_POSTED = P.USER_POSTED " +
             "AND P.USER_POSTED IN " +
             "(SELECT R.USER_FROM FROM RELATIONSHIP R " +
@@ -54,9 +52,9 @@ public class PostDAO extends GeneralDAO<Post> {
             "(SELECT R.USER_TO FROM RELATIONSHIP R " +
             "WHERE R.USER_FROM = :loggedInUserId " +
             "AND R.STATUS = 'FRIENDS') " +
-            "ORDER BY P.DATE_POSTED DESC) TMP " +
-            "WHERE ROWNUM <= :postsNumber) TMP " +
-            "WHERE RNUM > :offset";
+            "ORDER BY P.DATE_POSTED DESC " +
+            "OFFSET :offset ROWS " +
+            "FETCH NEXT :postsNumber ROWS ONLY";
 
     public PostDAO() {
         setTypeParameterOfClass(Post.class);
