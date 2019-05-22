@@ -24,7 +24,9 @@ public class PostService {
         this.relationshipDAO = relationshipDAO;
     }
 
-    public List<Post> getFriendsPostsWithOffset(long loggedInUserId, long offset) throws InternalServerError, BadRequestException {
+    public List<Post> getFriendsPostsWithOffset(long loggedInUserId, long offset)
+            throws InternalServerError, BadRequestException {
+
         if (offset < 0) {
             throw new BadRequestException("Wrong offset");
         }
@@ -62,7 +64,9 @@ public class PostService {
         return posts;
     }
 
-    public List<Post> getPostsByFriends(long loggedInUserId, long userPagePostedId) throws InternalServerError, BadRequestException {
+    public List<Post> getPostsByFriends(long loggedInUserId, long userPagePostedId)
+            throws InternalServerError, BadRequestException {
+
         if (userPagePostedId <= 0) {
             throw new BadRequestException("Wrong id " + userPagePostedId);
         }
@@ -86,7 +90,9 @@ public class PostService {
         return posts;
     }
 
-    public List<Post> getPostsByUserPosted(long userPostedId, long userPagePostedId) throws InternalServerError, BadRequestException {
+    public List<Post> getPostsByUserPosted(long userPostedId, long userPagePostedId)
+            throws InternalServerError, BadRequestException {
+
         if (userPostedId <= 0) {
             throw new BadRequestException("Wrong id " + userPostedId);
         }

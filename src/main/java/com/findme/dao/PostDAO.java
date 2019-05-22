@@ -5,9 +5,7 @@ import com.findme.models.Post;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.NoResultException;
 import javax.persistence.Query;
-import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -15,45 +13,26 @@ import java.util.List;
 public class PostDAO extends GeneralDAO<Post> {
 
     private static final String POST_BY_USER_PAGE_POSTED
-            = "SELECT * FROM POST " +
-            "WHERE POST.USER_PAGE_POSTED = :userPagePostedId";
+            = "SELECT * FROM POST WHERE POST.USER_PAGE_POSTED = :userPagePostedId";
 
     private static final String POSTS_BY_PAGE_OWNER
-            = "SELECT * FROM POST " +
-            "WHERE POST.USER_POSTED = POST.USER_PAGE_POSTED " +
-            "AND POST.USER_PAGE_POSTED = :pageOwnerId " +
-            "AND POST.USER_POSTED = :pageOwnerId";
+            = "SELECT * FROM POST WHERE POST.USER_POSTED = POST.USER_PAGE_POSTED " +
+            "AND POST.USER_PAGE_POSTED = :pageOwnerId AND POST.USER_POSTED = :pageOwnerId";
 
     private static final String POSTS_BY_USER_POSTED
-            = "SELECT * FROM POST " +
-            "WHERE POST.USER_POSTED = :userPostedId " +
-            "AND POST.USER_PAGE_POSTED = :userPagePostedId";
+            = "SELECT * FROM POST WHERE POST.USER_POSTED = :userPostedId AND POST.USER_PAGE_POSTED = :userPagePostedId";
 
     private static final String POSTS_BY_FRIENDS
-            = "SELECT * FROM POST P " +
-            "WHERE P.USER_PAGE_POSTED = :userPagePostedId " +
-            "AND P.USER_POSTED IN " +
-            "(SELECT R.USER_FROM FROM RELATIONSHIP R " +
-            "WHERE R.USER_TO = :loggedInUserId " +
-            "AND R.STATUS = 'FRIENDS') " +
-            "OR P.USER_POSTED IN " +
-            "(SELECT R.USER_TO FROM RELATIONSHIP R " +
-            "WHERE R.USER_FROM = :loggedInUserId " +
+            = "SELECT * FROM POST P WHERE P.USER_PAGE_POSTED = :userPagePostedId AND P.USER_POSTED IN " +
+            "(SELECT R.USER_FROM FROM RELATIONSHIP R WHERE R.USER_TO = :loggedInUserId AND R.STATUS = 'FRIENDS') " +
+            "OR P.USER_POSTED IN (SELECT R.USER_TO FROM RELATIONSHIP R WHERE R.USER_FROM = :loggedInUserId " +
             "AND R.STATUS = 'FRIENDS')";
 
     private static final String OLDER_FRIENDS_POST
-            = "SELECT * FROM POST P " +
-            "WHERE P.USER_PAGE_POSTED = P.USER_POSTED " +
-            "AND P.USER_POSTED IN " +
-            "(SELECT R.USER_FROM FROM RELATIONSHIP R " +
-            "WHERE R.USER_TO = :loggedInUserId " +
-            "AND R.STATUS = 'FRIENDS') " +
-            "OR P.USER_POSTED IN " +
-            "(SELECT R.USER_TO FROM RELATIONSHIP R " +
-            "WHERE R.USER_FROM = :loggedInUserId " +
-            "AND R.STATUS = 'FRIENDS') " +
-            "ORDER BY P.DATE_POSTED DESC " +
-            "OFFSET :offset ROWS " +
+            = "SELECT * FROM POST P WHERE P.USER_PAGE_POSTED = P.USER_POSTED AND P.USER_POSTED IN " +
+            "(SELECT R.USER_FROM FROM RELATIONSHIP R WHERE R.USER_TO = :loggedInUserId AND R.STATUS = 'FRIENDS') " +
+            "OR P.USER_POSTED IN (SELECT R.USER_TO FROM RELATIONSHIP R WHERE R.USER_FROM = :loggedInUserId " +
+            "AND R.STATUS = 'FRIENDS') ORDER BY P.DATE_POSTED DESC OFFSET :offset ROWS " +
             "FETCH NEXT :postsNumber ROWS ONLY";
 
     public PostDAO() {

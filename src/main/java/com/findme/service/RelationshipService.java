@@ -53,7 +53,8 @@ public class RelationshipService {
         Relationship relationship = relationshipDAO.getRelationshipByUsersId(userIdFrom, userIdTo);
 
         if (relationship != null) {
-            throw new BadRequestException("Relationship between users " + userIdFrom + " and " + userIdTo + " already exists");
+            throw new BadRequestException("Relationship between users " + userIdFrom + " and " + userIdTo
+                    + " already exists");
         }
 
         Relationship newRelationship = new Relationship();

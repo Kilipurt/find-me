@@ -16,21 +16,15 @@ public class RelationshipDAO extends GeneralDAO<Relationship> {
             = "SELECT * FROM RELATIONSHIP WHERE USER_FROM = :userIdFrom AND USER_TO = :userIdTo";
 
     private static final String GET_FRIENDS_RELATIONSHIP_BY_USERS_ID
-            = "SELECT * FROM RELATIONSHIP " +
-            "WHERE (USER_FROM = :firstUserId AND USER_TO = :secondUserId) " +
-            "OR (USER_FROM = :secondUserId AND USER_TO = :firstUserId) " +
-            "AND STATUS ='FRIENDS'";
+            = "SELECT * FROM RELATIONSHIP WHERE (USER_FROM = :firstUserId AND USER_TO = :secondUserId) " +
+            "OR (USER_FROM = :secondUserId AND USER_TO = :firstUserId) AND STATUS ='FRIENDS'";
 
     private static final String GET_USER_FRIENDS_COUNT
-            = "SELECT COUNT(*) FROM RELATIONSHIP " +
-            "WHERE (USER_FROM = :userId OR " +
-            "USER_TO = :userId) AND " +
+            = "SELECT COUNT(*) FROM RELATIONSHIP WHERE (USER_FROM = :userId OR USER_TO = :userId) AND " +
             "STATUS = 'FRIENDS'";
 
     private static final String GET_OUTCOME_REQUESTS_COUNT
-            = "SELECT COUNT(*) FROM RELATIONSHIP " +
-            "WHERE USER_FROM = :userId AND " +
-            "STATUS = 'REQUEST_SENT'";
+            = "SELECT COUNT(*) FROM RELATIONSHIP WHERE USER_FROM = :userId AND STATUS = 'REQUEST_SENT'";
 
     public RelationshipDAO() {
         setTypeParameterOfClass(Relationship.class);

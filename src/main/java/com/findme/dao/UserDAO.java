@@ -16,16 +16,12 @@ public class UserDAO extends GeneralDAO<User> {
     private static final String GET_USER_BY_PHONE = "SELECT * FROM USERS WHERE PHONE = :phone";
 
     private static final String GET_INCOME_REQUESTS
-            = "SELECT USERS.* FROM USERS " +
-            "JOIN RELATIONSHIP ON USERS.ID = RELATIONSHIP.USER_FROM " +
-            "WHERE RELATIONSHIP.USER_TO = :userId " +
-            "AND RELATIONSHIP.STATUS = 'REQUEST_SENT'";
+            = "SELECT USERS.* FROM USERS JOIN RELATIONSHIP ON USERS.ID = RELATIONSHIP.USER_FROM " +
+            "WHERE RELATIONSHIP.USER_TO = :userId AND RELATIONSHIP.STATUS = 'REQUEST_SENT'";
 
     private static final String GET_OUTCOME_REQUESTS
-            = "SELECT USERS.* FROM USERS " +
-            "JOIN RELATIONSHIP ON USERS.ID = RELATIONSHIP.USER_TO " +
-            "WHERE RELATIONSHIP.USER_FROM = :userId " +
-            "AND RELATIONSHIP.STATUS = 'REQUEST_SENT'";
+            = "SELECT USERS.* FROM USERS JOIN RELATIONSHIP ON USERS.ID = RELATIONSHIP.USER_TO " +
+            "WHERE RELATIONSHIP.USER_FROM = :userId AND RELATIONSHIP.STATUS = 'REQUEST_SENT'";
 
     public UserDAO() {
         setTypeParameterOfClass(User.class);
