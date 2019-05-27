@@ -38,7 +38,7 @@ public class UserController {
     }
 
     @RequestMapping(path = "/user/{userId}", method = RequestMethod.GET)
-    public String profile(Model model, @PathVariable() String userId) {
+    public String profile(HttpSession session, Model model, @PathVariable() String userId) {
         logger.info("UserController profile method. Moving to user page");
 
         try {
@@ -51,8 +51,14 @@ public class UserController {
             }
 
             model.addAttribute("user", user);
-            model.addAttribute("loginUserId", loginUserId);
-            model.addAttribute("relationshipStatus", relationshipService.getRelationshipStatus(loginUserId, id));
+            
+            if (loginUserId != null) {
+                model.addAttribute("loginUserId", loginUserId);
+            }
+
+            if (loginUserId != null) {
+                model.addAttribute("relationshipStatus", relationshipService.getRelationshipStatus(loginUserId, id));
+            }
 
             return "profile";
         } catch (NumberFormatException | BadRequestException e) {
