@@ -2,6 +2,7 @@ package com.findme.dao;
 
 import com.findme.exception.InternalServerError;
 import com.findme.models.User;
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,6 +13,8 @@ import java.util.List;
 @Repository
 @Transactional
 public class UserDAO extends GeneralDAO<User> {
+
+    private Logger logger = Logger.getLogger(UserDAO.class);
 
     private static final String GET_USER_BY_PHONE = "SELECT * FROM USERS WHERE PHONE = :phone";
 
@@ -28,6 +31,7 @@ public class UserDAO extends GeneralDAO<User> {
     }
 
     public User getUserByPhone(String phone) throws InternalServerError {
+        logger.info("UserDAO getUserByPhone method. Selecting user by phone " + phone);
         try {
             Query query = getEntityManager().createNativeQuery(GET_USER_BY_PHONE, User.class);
             query.setParameter("phone", phone);
@@ -36,15 +40,18 @@ public class UserDAO extends GeneralDAO<User> {
         } catch (NoResultException e) {
             return null;
         } catch (Exception e) {
+            logger.error("Getting is failed");
             throw new InternalServerError("Getting is failed");
         }
     }
 
     public List<User> getIncomeRequests(long userId) throws InternalServerError {
+        logger.info("UserDAO getIncomeRequests method. Selecting income requests of user " + userId);
         return getRequests(GET_INCOME_REQUESTS, userId);
     }
 
     public List<User> getOutcomeRequests(long userId) throws InternalServerError {
+        logger.info("UserDAO getOutcomeRequests method. Selecting outcome requests of user " + userId);
         return getRequests(GET_OUTCOME_REQUESTS, userId);
     }
 
@@ -54,7 +61,7 @@ public class UserDAO extends GeneralDAO<User> {
             query.setParameter("userId", userId);
             return query.getResultList();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Getting is failed");
             throw new InternalServerError("Getting is failed");
         }
     }

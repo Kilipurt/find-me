@@ -8,6 +8,7 @@ import com.findme.models.PostFilter;
 import com.findme.models.User;
 import com.findme.service.PostService;
 import com.findme.util.PostJsonUtil;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,7 @@ public class PostController {
 
     private PostService postService;
     private PostJsonUtil postJsonUtil;
+    private Logger logger = Logger.getLogger(PostController.class);
 
     @Autowired
     public PostController(PostService postService, PostJsonUtil postJsonUtil) {
@@ -33,14 +35,18 @@ public class PostController {
 
     @RequestMapping(path = "/feed/{loggedInUserId}", method = RequestMethod.GET)
     public String getFeed(Model model, HttpSession session, @PathVariable() String loggedInUserId) {
+        logger.info("PostController getFeed method. Moving to feed page");
+
         try {
             User loggedInUser = (User) session.getAttribute("user");
 
             if (loggedInUser == null) {
+                logger.error("PostController getFeed method. User is not authorized");
                 throw new UnauthorizedException("User is not authorized");
             }
 
             if (loggedInUser.getId() != Long.parseLong(loggedInUserId)) {
+                logger.error("PostController getFeed method. User does not have enough rights");
                 throw new BadRequestException("User does not have enough rights");
             }
 
@@ -59,10 +65,13 @@ public class PostController {
             HttpSession session,
             @RequestParam(value = "offset") String offset
     ) {
+        logger.info("PostController getFeed method. Selecting news posts");
+
         try {
             User loggedInUser = (User) session.getAttribute("user");
 
             if (loggedInUser == null) {
+                logger.error("PostController getFeed method. User is not authorized");
                 throw new UnauthorizedException("User is not authorized");
             }
 
@@ -82,10 +91,13 @@ public class PostController {
             HttpSession session,
             @ModelAttribute Post post
     ) {
+        logger.info("PostController addPost method. Adding new post");
+
         try {
             User loggedInUser = (User) session.getAttribute("user");
 
             if (loggedInUser == null) {
+                logger.error("PostController addPost method. User is not authorized");
                 throw new UnauthorizedException("User is not authorized");
             }
 
@@ -106,10 +118,13 @@ public class PostController {
             HttpSession session,
             @ModelAttribute PostFilter postFilter
     ) {
+        logger.info("PostController getPosts method. Selecting posts by filter");
+
         try {
             User loggedInUser = (User) session.getAttribute("user");
 
             if (loggedInUser == null) {
+                logger.error("PostController getPosts method. User is not authorized");
                 throw new UnauthorizedException("User is not authorized");
             }
 
@@ -129,14 +144,18 @@ public class PostController {
             HttpSession session,
             @ModelAttribute Post post
     ) {
+        logger.info("PostController updatePost method. Updating post");
+
         try {
             User loggedInUser = (User) session.getAttribute("user");
 
             if (loggedInUser == null) {
+                logger.error("PostController updatePost method. User is not authorized");
                 throw new UnauthorizedException("User is not authorized");
             }
 
             if (!loggedInUser.getId().equals(post.getUserPosted().getId())) {
+                logger.error("PostController updatePost method. Logged in user does not have enough rights");
                 throw new BadRequestException("Logged in user does not have enough rights");
             }
 
@@ -158,14 +177,18 @@ public class PostController {
             @RequestParam(value = "postId") String postId,
             @RequestParam(value = "userPostedId") String userPostedId
     ) {
+        logger.info("PostController deletePost method. Deleting post");
+
         try {
             User loggedInUser = (User) session.getAttribute("user");
 
             if (loggedInUser == null) {
+                logger.error("PostController deletePost method. User is not authorized");
                 throw new UnauthorizedException("User is not authorized");
             }
 
             if (!loggedInUser.getId().equals(Long.parseLong(userPostedId))) {
+                logger.error("PostController deletePost method. Logged in user does not have enough rights");
                 throw new BadRequestException("Logged in user does not have enough rights");
             }
 

@@ -2,6 +2,7 @@ package com.findme.dao;
 
 import com.findme.exception.InternalServerError;
 import com.findme.models.Post;
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,6 +12,8 @@ import java.util.List;
 @Repository
 @Transactional
 public class PostDAO extends GeneralDAO<Post> {
+
+    private Logger logger = Logger.getLogger(PostDAO.class);
 
     private static final String POST_BY_USER_PAGE_POSTED
             = "SELECT * FROM POST WHERE POST.USER_PAGE_POSTED = :userPagePostedId";
@@ -40,6 +43,9 @@ public class PostDAO extends GeneralDAO<Post> {
     }
 
     public List<Post> getFriendsPostWithOffset(long loggedInUserId, long offset) throws InternalServerError {
+        logger.info("PostDAO getFriendsPostWithOffset method. Selecting friends posts for user " + loggedInUserId
+                + " with offset " + offset);
+
         try {
             Query query = getEntityManager().createNativeQuery(OLDER_FRIENDS_POST, Post.class);
             query.setParameter("loggedInUserId", loggedInUserId);
@@ -48,33 +54,43 @@ public class PostDAO extends GeneralDAO<Post> {
 
             return query.getResultList();
         } catch (Exception e) {
+            logger.error("Getting is failed");
             throw new InternalServerError("Getting is failed");
         }
     }
 
     public List<Post> getPostsByPage(long userPagePostedId) throws InternalServerError {
+        logger.info("PostDAO getPostsByPage method. Selecting posts by page " + userPagePostedId);
+
         try {
             Query query = getEntityManager().createNativeQuery(POST_BY_USER_PAGE_POSTED, Post.class);
             query.setParameter("userPagePostedId", userPagePostedId);
 
             return query.getResultList();
         } catch (Exception e) {
+            logger.error("Getting is failed");
             throw new InternalServerError("Getting is failed");
         }
     }
 
     public List<Post> getPostsByPageOwner(long pageOwnerId) throws InternalServerError {
+        logger.info("PostDAO getPostsByPageOwner method. Selecting posts by page owner " + pageOwnerId);
+
         try {
             Query query = getEntityManager().createNativeQuery(POSTS_BY_PAGE_OWNER, Post.class);
             query.setParameter("pageOwnerId", pageOwnerId);
 
             return query.getResultList();
         } catch (Exception e) {
+            logger.error("Getting is failed");
             throw new InternalServerError("Getting is failed");
         }
     }
 
     public List<Post> getPostsByUserPosted(long userPostedId, long userPagePostedId) throws InternalServerError {
+        logger.info("PostDAO getPostsByUserPosted method. Selecting posts by user posted " + userPostedId + " on page "
+                + userPagePostedId);
+
         try {
             Query query = getEntityManager().createNativeQuery(POSTS_BY_USER_POSTED, Post.class);
             query.setParameter("userPostedId", userPostedId);
@@ -82,11 +98,15 @@ public class PostDAO extends GeneralDAO<Post> {
 
             return query.getResultList();
         } catch (Exception e) {
+            logger.error("Getting is failed");
             throw new InternalServerError("Getting is failed");
         }
     }
 
     public List<Post> getPostsByFriends(long loggedInUserId, long userPagePostedId) throws InternalServerError {
+        logger.info("PostDAO getPostsByFriends method. Selecting posts by friends of user " + loggedInUserId
+                + " on page " + userPagePostedId);
+
         try {
             Query query = getEntityManager().createNativeQuery(POSTS_BY_FRIENDS, Post.class);
             query.setParameter("loggedInUserId", loggedInUserId);
@@ -94,6 +114,7 @@ public class PostDAO extends GeneralDAO<Post> {
 
             return query.getResultList();
         } catch (Exception e) {
+            logger.error("Getting is failed");
             throw new InternalServerError("Getting is failed");
         }
     }

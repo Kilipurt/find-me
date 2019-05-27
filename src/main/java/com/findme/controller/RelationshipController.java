@@ -5,6 +5,7 @@ import com.findme.exception.InternalServerError;
 import com.findme.exception.UnauthorizedException;
 import com.findme.models.User;
 import com.findme.service.RelationshipService;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpSession;
 @Controller
 public class RelationshipController {
     private RelationshipService relationshipService;
+    private Logger logger = Logger.getLogger(RelationshipController.class);
 
     @Autowired
     public RelationshipController(RelationshipService relationshipService) {
@@ -28,14 +30,18 @@ public class RelationshipController {
             @RequestParam(name = "userIdFrom") String userIdFrom,
             @RequestParam(name = "userIdTo") String userIdTo
     ) {
+        logger.info("RelationshipController addRelationship method. Adding relationship");
+
         try {
             User loggedInUser = (User) session.getAttribute("user");
 
             if (loggedInUser == null) {
+                logger.error("RelationshipController addRelationship method. User is not authorized");
                 throw new UnauthorizedException("User is not authorized");
             }
 
             if (Long.parseLong(userIdFrom) != loggedInUser.getId()) {
+                logger.error("RelationshipController addRelationship method. User has not enough rights");
                 throw new BadRequestException("User has not enough rights");
             }
 
@@ -57,10 +63,13 @@ public class RelationshipController {
             @RequestParam(value = "userIdTo") String userIdTo,
             @RequestParam(value = "status") String status
     ) {
+        logger.info("RelationshipController updateRelationship method. Updating relationship");
+
         try {
             User loggedInUser = (User) session.getAttribute("user");
 
             if (loggedInUser == null) {
+                logger.error("RelationshipController updateRelationship method. User is not authorized");
                 throw new UnauthorizedException("User is not authorized");
             }
 

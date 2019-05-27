@@ -8,6 +8,7 @@ import com.findme.models.User;
 import com.findme.service.RelationshipService;
 import com.findme.service.UserService;
 import com.findme.util.RequestJsonUtil;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,7 @@ public class UserController {
     private UserService userService;
     private RelationshipService relationshipService;
     private RequestJsonUtil requestJsonUtil;
+    private Logger logger = Logger.getLogger(UserController.class);
 
     private Long loginUserId;
 
@@ -37,12 +39,14 @@ public class UserController {
 
     @RequestMapping(path = "/user/{userId}", method = RequestMethod.GET)
     public String profile(Model model, @PathVariable() String userId) {
+        logger.info("UserController profile method. Moving to user page");
 
         try {
             Long id = Long.parseLong(userId);
             User user = userService.findById(id);
 
             if (user == null) {
+                logger.error("UserController profile method. User with id " + id + " was not found");
                 throw new NotFoundException("User with id " + id + " was not found");
             }
 
@@ -65,6 +69,8 @@ public class UserController {
 
     @RequestMapping(path = "/user-registration", method = RequestMethod.POST)
     public ResponseEntity<String> registerUser(@ModelAttribute User user) {
+        logger.info("UserController registerUser method. Register new user");
+
         try {
             userService.save(user);
             return new ResponseEntity<>("Registration is success", HttpStatus.OK);
@@ -81,6 +87,8 @@ public class UserController {
             @RequestParam(value = "phone") String phone,
             @RequestParam(value = "password") String password
     ) {
+        logger.info("UserController login method.");
+
         try {
             User user = userService.login(phone, password);
             session.setAttribute("user", user);
@@ -96,6 +104,8 @@ public class UserController {
 
     @RequestMapping(path = "/logout", method = RequestMethod.GET)
     public ResponseEntity<String> logout(HttpSession session) {
+        logger.info("UserController logout method.");
+
         User user = (User) session.getAttribute("user");
         user.setDateLastActive(new Date());
 
@@ -112,14 +122,18 @@ public class UserController {
 
     @RequestMapping(path = "/outcome-requests/{userId}", method = RequestMethod.GET)
     public ResponseEntity<String> getOutcomeRequests(HttpSession session, @PathVariable String userId) {
+        logger.info("UserController getOutcomeRequests method. Selecting outcome requests");
+
         try {
             User loggedInUser = (User) session.getAttribute("user");
 
             if (loggedInUser == null) {
+                logger.error("UserController getOutcomeRequests method. User is not authorized");
                 throw new UnauthorizedException("User is not authorized");
             }
 
             if (Long.parseLong(userId) != loggedInUser.getId()) {
+                logger.error("UserController getOutcomeRequests method. User has not enough rights");
                 throw new BadRequestException("User has not enough rights");
             }
 
@@ -137,14 +151,18 @@ public class UserController {
 
     @RequestMapping(path = "/income-requests/{userId}", method = RequestMethod.GET)
     public ResponseEntity<String> getIncomeRequests(HttpSession session, @PathVariable String userId) {
+        logger.info("UserController getIncomeRequests method. Selecting income requests");
+
         try {
             User loggedInUser = (User) session.getAttribute("user");
 
             if (loggedInUser == null) {
+                logger.error("UserController getIncomeRequests method. User is not authorized");
                 throw new UnauthorizedException("User is not authorized");
             }
 
             if (Long.parseLong(userId) != loggedInUser.getId()) {
+                logger.error("UserController getIncomeRequests method. User has not enough rights");
                 throw new BadRequestException("User has not enough rights");
             }
 
