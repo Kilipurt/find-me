@@ -1,4 +1,4 @@
-package com.findme.controller;
+package com.findme.controller.viewResponseController;
 
 import com.findme.exception.NotFoundException;
 import com.findme.models.User;
@@ -12,18 +12,20 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import javax.servlet.http.HttpSession;
+
 @Controller
-public class UserControllerViewResponse {
+public class UserController {
 
     private UserService userService;
     private RelationshipService relationshipService;
 
-    private Logger logger = Logger.getLogger(UserControllerStatusResponse.class);
+    private Logger logger = Logger.getLogger(UserController.class);
 
     private static Long loginUserId;
 
     @Autowired
-    public UserControllerViewResponse(UserService userService, RelationshipService relationshipService) {
+    public UserController(UserService userService, RelationshipService relationshipService) {
         this.userService = userService;
         this.relationshipService = relationshipService;
     }
@@ -33,7 +35,7 @@ public class UserControllerViewResponse {
     }
 
     public static void setLoginUserId(Long loginUserId) {
-        UserControllerViewResponse.loginUserId = loginUserId;
+        UserController.loginUserId = loginUserId;
     }
 
     @RequestMapping(path = "/user/{userId}", method = RequestMethod.GET)

@@ -1,4 +1,4 @@
-package com.findme.controller;
+package com.findme.controller.statusResponseController;
 
 import com.findme.exception.BadRequestException;
 import com.findme.exception.UnauthorizedException;
@@ -14,29 +14,21 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 
 @Controller
-public class RelationshipControllerStatusResponse {
+public class RelationshipControllerStatus {
     private RelationshipService relationshipService;
-    private Logger logger = Logger.getLogger(RelationshipControllerStatusResponse.class);
+    private Logger logger = Logger.getLogger(RelationshipControllerStatus.class);
 
     @Autowired
-    public RelationshipControllerStatusResponse(RelationshipService relationshipService) {
+    public RelationshipControllerStatus(RelationshipService relationshipService) {
         this.relationshipService = relationshipService;
     }
 
     @RequestMapping(path = "/add-relationship", method = RequestMethod.POST)
-    public ResponseEntity<String> addRelationship(
-            HttpSession session,
-            @RequestParam(name = "userIdFrom") String userIdFrom,
-            @RequestParam(name = "userIdTo") String userIdTo
-    ) throws Exception {
+    public ResponseEntity<String> addRelationship(HttpSession session, @RequestParam(name = "userIdFrom")
+            String userIdFrom, @RequestParam(name = "userIdTo") String userIdTo) throws Exception {
         logger.info("RelationshipController addRelationship method. Adding relationship");
 
         User loggedInUser = (User) session.getAttribute("user");
-
-        if (loggedInUser == null) {
-            logger.error("RelationshipController addRelationship method. User is not authorized");
-            throw new UnauthorizedException("User is not authorized");
-        }
 
         if (Long.parseLong(userIdFrom) != loggedInUser.getId()) {
             logger.error("RelationshipController addRelationship method. User has not enough rights");
@@ -48,20 +40,12 @@ public class RelationshipControllerStatusResponse {
     }
 
     @RequestMapping(path = "/update-relationship", method = RequestMethod.PUT)
-    public ResponseEntity<String> updateRelationship(
-            HttpSession session,
-            @RequestParam(value = "userIdFrom") String userIdFrom,
-            @RequestParam(value = "userIdTo") String userIdTo,
-            @RequestParam(value = "status") String status
-    ) throws Exception {
+    public ResponseEntity<String> updateRelationship(HttpSession session, @RequestParam(value = "userIdFrom")
+            String userIdFrom, @RequestParam(value = "userIdTo") String userIdTo, @RequestParam(value = "status")
+            String status) throws Exception {
         logger.info("RelationshipController updateRelationship method. Updating relationship");
 
         User loggedInUser = (User) session.getAttribute("user");
-
-        if (loggedInUser == null) {
-            logger.error("RelationshipController updateRelationship method. User is not authorized");
-            throw new UnauthorizedException("User is not authorized");
-        }
 
         relationshipService.update(Long.parseLong(userIdFrom), Long.parseLong(userIdTo), status, loggedInUser);
         return new ResponseEntity<>(HttpStatus.OK);

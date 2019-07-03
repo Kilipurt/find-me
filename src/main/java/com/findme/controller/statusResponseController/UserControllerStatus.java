@@ -1,7 +1,6 @@
-package com.findme.controller;
+package com.findme.controller.statusResponseController;
 
 import com.findme.exception.BadRequestException;
-import com.findme.exception.UnauthorizedException;
 import com.findme.models.User;
 import com.findme.service.UserService;
 import com.findme.util.RequestJsonUtil;
@@ -15,15 +14,14 @@ import javax.servlet.http.HttpSession;
 import java.util.*;
 
 @RestController
-public class UserControllerStatusResponse {
+public class UserControllerStatus {
 
     private UserService userService;
     private RequestJsonUtil requestJsonUtil;
-    private Logger logger = Logger.getLogger(UserControllerStatusResponse.class);
-
+    private Logger logger = Logger.getLogger(UserControllerStatus.class);
 
     @Autowired
-    public UserControllerStatusResponse(UserService userService, RequestJsonUtil requestJsonUtil) {
+    public UserControllerStatus(UserService userService, RequestJsonUtil requestJsonUtil) {
         this.userService = userService;
         this.requestJsonUtil = requestJsonUtil;
     }
@@ -37,16 +35,13 @@ public class UserControllerStatusResponse {
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.GET)
-    public ResponseEntity<String> login(
-            HttpSession session,
-            @RequestParam(value = "phone") String phone,
-            @RequestParam(value = "password") String password
-    ) throws Exception {
+    public ResponseEntity<String> login(HttpSession session, @RequestParam(value = "phone") String phone,
+            @RequestParam(value = "password") String password) throws Exception {
         logger.info("UserController login method.");
 
         User user = userService.login(phone, password);
         session.setAttribute("user", user);
-        UserControllerViewResponse.setLoginUserId(user.getId());
+        com.findme.controller.viewResponseController.UserController.setLoginUserId(user.getId());
         return new ResponseEntity<>(user.getId().toString(), HttpStatus.OK);
     }
 
@@ -58,19 +53,16 @@ public class UserControllerStatusResponse {
         user.setDateLastActive(new Date());
         userService.update(user);
         session.invalidate();
+        com.findme.controller.viewResponseController.UserController.setLoginUserId(null);
         return new ResponseEntity<>("success", HttpStatus.OK);
     }
 
     @RequestMapping(path = "/outcome-requests/{userId}", method = RequestMethod.GET)
-    public ResponseEntity<String> getOutcomeRequests(HttpSession session, @PathVariable String userId) throws Exception {
+    public ResponseEntity<String> getOutcomeRequests(HttpSession session, @PathVariable String userId)
+            throws Exception {
         logger.info("UserController getOutcomeRequests method. Selecting outcome requests");
 
         User loggedInUser = (User) session.getAttribute("user");
-
-        if (loggedInUser == null) {
-            logger.error("UserController getOutcomeRequests method. User is not authorized");
-            throw new UnauthorizedException("User is not authorized");
-        }
 
         if (Long.parseLong(userId) != loggedInUser.getId()) {
             logger.error("UserController getOutcomeRequests method. User has not enough rights");
@@ -86,11 +78,6 @@ public class UserControllerStatusResponse {
         logger.info("UserController getIncomeRequests method. Selecting income requests");
 
         User loggedInUser = (User) session.getAttribute("user");
-
-        if (loggedInUser == null) {
-            logger.error("UserController getIncomeRequests method. User is not authorized");
-            throw new UnauthorizedException("User is not authorized");
-        }
 
         if (Long.parseLong(userId) != loggedInUser.getId()) {
             logger.error("UserController getIncomeRequests method. User has not enough rights");

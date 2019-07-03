@@ -116,75 +116,83 @@
             document.getElementById("incomeRequests").style.display = 'none';
             document.getElementById("outcomeRequests").style.display = 'none';
         }
+
+        if ($('#loginUserId').text() == '') {
+            document.getElementById("logout").style.display = 'none';
+        }
     });
 
     $(document).ready(function (e) {
-        $.ajax({
-            url: "/income-requests/" + $('#loginUserId').text(),
-            type: "GET",
-            success: function success(xhr) {
-                var incomeRequestsDiv = document.getElementById("incomeRequests");
+        if ($('#userId').text() == $('#loginUserId').text()) {
+            $.ajax({
+                url: "/income-requests/" + $('#loginUserId').text(),
+                type: "GET",
+                success: function success(xhr) {
+                    var incomeRequestsDiv = document.getElementById("incomeRequests");
 
-                var users = JSON.parse(xhr.toString());
+                    var users = JSON.parse(xhr.toString());
 
-                for (var i = 0; i < users.users.length; i++) {
-                    var aloneRequestDiv = document.createElement("div");
+                    for (var i = 0; i < users.users.length; i++) {
+                        var aloneRequestDiv = document.createElement("div");
 
-                    aloneRequestDiv.innerHTML = users.users[i].id + " "
-                        + users.users[i].firstName + " "
-                        + users.users[i].lastName + " ";
+                        aloneRequestDiv.innerHTML = users.users[i].id + " "
+                            + users.users[i].firstName + " "
+                            + users.users[i].lastName + " ";
 
-                    var denyButton = document.createElement("button");
-                    denyButton.innerHTML = "Deny request";
-                    denyButton.id = "denyButton" + users.users[i].id;
-                    denyButton.addEventListener("click", denyRequest);
+                        var denyButton = document.createElement("button");
+                        denyButton.innerHTML = "Deny request";
+                        denyButton.id = "denyButton" + users.users[i].id;
+                        denyButton.addEventListener("click", denyRequest);
 
-                    aloneRequestDiv.insertAdjacentElement("beforeEnd", denyButton);
+                        aloneRequestDiv.insertAdjacentElement("beforeEnd", denyButton);
 
-                    var acceptButton = document.createElement("button");
-                    acceptButton.innerHTML = "Accept request";
-                    acceptButton.id = "acceptButton" + users.users[i].id;
-                    acceptButton.addEventListener("click", acceptRequest);
+                        var acceptButton = document.createElement("button");
+                        acceptButton.innerHTML = "Accept request";
+                        acceptButton.id = "acceptButton" + users.users[i].id;
+                        acceptButton.addEventListener("click", acceptRequest);
 
-                    aloneRequestDiv.insertAdjacentElement("beforeEnd", acceptButton);
-                    incomeRequestsDiv.insertAdjacentElement("beforeEnd", aloneRequestDiv);
+                        aloneRequestDiv.insertAdjacentElement("beforeEnd", acceptButton);
+                        incomeRequestsDiv.insertAdjacentElement("beforeEnd", aloneRequestDiv);
+                    }
+                },
+                error: function error(xhr) {
+                    alert(xhr.responseText);
                 }
-            },
-            error: function error(xhr) {
-                alert(xhr.responseText);
-            }
-        });
+            });
+        }
         return false;
     });
 
     $(document).ready(function (e) {
-        $.ajax({
-            url: "/outcome-requests/" + $('#loginUserId').text(),
-            type: "GET",
-            success: function success(xhr) {
-                var outcomeRequestsDiv = document.getElementById("outcomeRequests");
-                var users = JSON.parse(xhr.toString());
+        if ($('#userId').text() == $('#loginUserId').text()) {
+            $.ajax({
+                url: "/outcome-requests/" + $('#loginUserId').text(),
+                type: "GET",
+                success: function success(xhr) {
+                    var outcomeRequestsDiv = document.getElementById("outcomeRequests");
+                    var users = JSON.parse(xhr.toString());
 
-                for (var i = 0; i < users.users.length; i++) {
-                    var aloneRequestDiv = document.createElement("div");
+                    for (var i = 0; i < users.users.length; i++) {
+                        var aloneRequestDiv = document.createElement("div");
 
-                    aloneRequestDiv.innerHTML = users.users[i].id + " "
-                        + users.users[i].firstName + " "
-                        + users.users[i].lastName + " ";
+                        aloneRequestDiv.innerHTML = users.users[i].id + " "
+                            + users.users[i].firstName + " "
+                            + users.users[i].lastName + " ";
 
-                    var cancelButton = document.createElement("button");
-                    cancelButton.innerHTML = "Cancel request";
-                    cancelButton.id = "cancelButton" + users.users[i].id;
-                    cancelButton.addEventListener("click", cancelRequest);
+                        var cancelButton = document.createElement("button");
+                        cancelButton.innerHTML = "Cancel request";
+                        cancelButton.id = "cancelButton" + users.users[i].id;
+                        cancelButton.addEventListener("click", cancelRequest);
 
-                    aloneRequestDiv.insertAdjacentElement("beforeEnd", cancelButton);
-                    outcomeRequestsDiv.insertAdjacentElement("beforeEnd", aloneRequestDiv);
+                        aloneRequestDiv.insertAdjacentElement("beforeEnd", cancelButton);
+                        outcomeRequestsDiv.insertAdjacentElement("beforeEnd", aloneRequestDiv);
+                    }
+                },
+                error: function error(xhr) {
+                    alert(xhr.responseText);
                 }
-            },
-            error: function error(xhr) {
-                alert(xhr.responseText);
-            }
-        });
+            });
+        }
         return false;
     });
 
