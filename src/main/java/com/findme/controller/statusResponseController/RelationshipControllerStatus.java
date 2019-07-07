@@ -1,7 +1,6 @@
 package com.findme.controller.statusResponseController;
 
 import com.findme.exception.BadRequestException;
-import com.findme.exception.UnauthorizedException;
 import com.findme.models.User;
 import com.findme.service.RelationshipService;
 import org.apache.log4j.Logger;

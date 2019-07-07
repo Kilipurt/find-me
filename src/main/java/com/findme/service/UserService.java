@@ -41,10 +41,10 @@ public class UserService {
     }
 
     public void delete(long id) throws InternalServerError, BadRequestException {
-        logger.info("UserService delete method. Deleting user");
+        logger.info("UserService updateDateDeleted method. Deleting user");
 
         if (id <= 0) {
-            logger.error("UserService delete method. Wrong enter id " + id);
+            logger.error("UserService updateDateDeleted method. Wrong enter id " + id);
             throw new BadRequestException("Wrong enter id " + id);
         }
 

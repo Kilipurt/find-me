@@ -1,4 +1,4 @@
-package com.findme.service.updateValidation;
+package com.findme.service.updateRelationshipValidation;
 
 import com.findme.exception.BadRequestException;
 import com.findme.models.RelationshipStatus;
@@ -23,9 +23,9 @@ public class FriendshipTimeValidator extends GeneralValidator {
 
         if (days < 3) {
             logger.error("FriendshipTimeValidator validate method. Users must be friends at least 3 days in order to " +
-                    "delete this user from friends list");
+                    "updateDateDeleted this user from friends list");
             throw new BadRequestException("You must be friends at least 3 days " +
-                    "in order to delete this user from friends list");
+                    "in order to updateDateDeleted this user from friends list");
         }
 
         validateNext(validationData);

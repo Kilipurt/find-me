@@ -150,10 +150,10 @@ public class PostService {
     }
 
     public void delete(long id) throws InternalServerError, BadRequestException {
-        logger.info("PostService delete method. Deleting post " + id);
+        logger.info("PostService updateDateDeleted method. Deleting post " + id);
 
         if (id <= 0) {
-            logger.error("PostService delete method. Wrong enter id " + id);
+            logger.error("PostService updateDateDeleted method. Wrong enter id " + id);
             throw new BadRequestException("Wrong enter id " + id);
         }
 

@@ -38,7 +38,7 @@ public abstract class GeneralDAO<T> {
     }
 
     public void delete(long id) throws InternalServerError {
-        logger.info("GeneralDAO delete() method. Deleting " + typeParameterOfClass.toString());
+        logger.info("GeneralDAO updateDateDeleted() method. Deleting " + typeParameterOfClass.toString());
 
         try {
             entityManager.remove(entityManager.find(typeParameterOfClass, id));

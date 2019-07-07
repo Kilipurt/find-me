@@ -9,7 +9,7 @@ import com.findme.models.Relationship;
 import com.findme.models.RelationshipStatus;
 import com.findme.models.User;
 import com.findme.models.ValidationData;
-import com.findme.service.updateValidation.*;
+import com.findme.service.updateRelationshipValidation.*;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,10 +34,11 @@ public class RelationshipService {
                 + userIdFrom + " and " + userIdTo);
 
         if (userIdFrom == userIdTo) {
-            return "You are friend to yourself";
+            return "You are friend for yourself";
         }
 
         Relationship relationship = relationshipDAO.getRelationshipByUsersId(userIdFrom, userIdTo);
+        relationship = relationship == null ? relationshipDAO.getRelationshipByUsersId(userIdTo, userIdFrom) : relationship;
 
         if (relationship == null) {
             return "Not friends";

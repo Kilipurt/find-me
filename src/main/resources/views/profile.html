@@ -11,42 +11,39 @@
 <div>
     <div class="left">
         <h1>Photo</h1>
-
-        <div>
-            <button class="btn">Send message</button>
-        </div>
     </div>
 
     <div class="right">
         <p class="userId" id="userId" th:text="${user.id}"></p>
-        <p th:text="${user.firstName}"></p>
-        <p th:text="${user.lastName}"></p>
-        <p th:text="${user.phone}"></p>
-        <p th:text="${user.country}"></p>
-        <p th:text="${user.city}"></p>
-        <p th:text="${user.age}"></p>
-        <p th:text="${user.dateRegistered}"></p>
-        <p th:text="${user.dateLastActive}"></p>
-        <p th:text="${user.relationshipStatus}"></p>
-        <p th:text="${user.religion}"></p>
-        <p th:text="${user.school}"></p>
-        <p th:text="${user.university}"></p>
-        <p class="loginUserId" id="loginUserId" th:text="${loginUserId}"></p>
+        <p class="userFirstName" id="userFirstName" th:text="${user.firstName}"></p>
+        <p class="userLastName" id="userLastName" th:text="${user.lastName}"></p>
+        <p class="userPhone" id="userPhone" th:text="${user.phone}"></p>
+        <p class="userCountry" id="userCountry" th:text="${user.country}"></p>
+        <p class="userCity" id="userCity" th:text="${user.city}"></p>
+        <p class="userAge" id="userAge" th:text="${user.age}"></p>
+        <p class="userDateRegistered" id="userDateRegistered" th:text="${user.dateRegistered}"></p>
+        <p class="userDateLastActive" id="userDateLastActive" th:text="${user.dateLastActive}"></p>
+        <p class="userRelationshipStatus" id="userRelationshipStatus" th:text="${user.relationshipStatus}"></p>
+        <p class="userReligion" id="userReligion" th:text="${user.religion}"></p>
+        <p class="userSchool" id="userSchool" th:text="${user.school}"></p>
+        <p class="userUniversity" id="userUniversity" th:text="${user.university}"></p>
+
+        <p class="loginUserId" id="loginUserId" th:text="${loginUser.id}" hidden></p>
     </div>
 
     <!--<div class="post-div">-->
-        <!--<form id="post-form">-->
-            <!--<p>Message</p>-->
-            <!--<input id="postMessage" name="postMessage" type="text"/>-->
+    <!--<form id="post-form">-->
+    <!--<p>Message</p>-->
+    <!--<input id="postMessage" name="postMessage" type="text"/>-->
 
-            <!--<p>Tagged users</p>-->
-            <!--<input id="taggedUsers" name="taggedUsers" type="text"/>-->
+    <!--<p>Tagged users</p>-->
+    <!--<input id="taggedUsers" name="taggedUsers" type="text"/>-->
 
-            <!--<p>Location</p>-->
-            <!--<input id="location" name="location" type="text"/>-->
+    <!--<p>Location</p>-->
+    <!--<input id="location" name="location" type="text"/>-->
 
-            <!--<button type="submit">Create</button>-->
-        <!--</form>-->
+    <!--<button type="submit">Create</button>-->
+    <!--</form>-->
     <!--</div>-->
 
     <button id="news-button" type="submit" onclick="newsLoad()">News</button>
@@ -62,18 +59,29 @@
     <div class="outcomeRequests" id="outcomeRequests">
         <h4>Outcome Requests</h4>
     </div>
+
+    <p>
+        <button id="sentFriendRequest" type="submit">Add to friends</button>
+    </p>
+
+    <p>
+        <button id="sentMessageFormDisplay" onclick="displaySentMessageForm()">Sent message</button>
+    </p>
+
+    <form id="sent-message-form">
+        <p>Text:</p>
+        <input id="text" type="text" name="text"/>
+        <button type="submit">Send Message</button>
+    </form>
+    <button id="sentMessageFormHide" onclick="hideSentMessageForm()">Cancel</button>
+
+    <p class="logout">
+        <button id="logout" type="submit">Logout</button>
+    </p>
 </div>
 <!--/.container-->
 <!---->
 <!--<div th:replace="fragments/footer :: footer"/>-->
-
-<p>
-    <button id="sentFriendRequest" type="submit">Add to friends</button>
-</p>
-
-<p class="logout">
-    <button id="logout" type="submit">Logout</button>
-</p>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </body>
@@ -107,18 +115,58 @@
     }
 </style>
 
-<script>
+<script th:inline="javascript">
+    function displaySentMessageForm() {
+        document.getElementById('sentMessageFormDisplay').style.display = 'none';
+        document.getElementById('sent-message-form').style.display = 'block';
+        document.getElementById('sentMessageFormHide').style.display = 'block';
+    }
+
+    function hideSentMessageForm() {
+        document.getElementById('sent-message-form').style.display = 'none';
+        document.getElementById('sentMessageFormHide').style.display = 'none';
+        document.getElementById('sentMessageFormDisplay').style.display = 'block';
+    }
+
+    $('#sent-message-form').submit(function (e) {
+        var userTo = [[${user}]];
+        var userFrom = [[${loginUser}]];
+
+        var message = {
+            text: document.getElementById('text').value,
+            userTo: userTo,
+            userFrom: userFrom
+        };
+
+        $.ajax({
+            url: "/send-message",
+            type: "POST",
+            data: JSON.stringify(message),
+            dataType: "json",
+            contentType: "application/json",
+            success: function success(xhr) {
+                hideSentMessageForm();
+                alert("Message sent successfully");
+            },
+            error: function error(xhr) {
+                alert(xhr.responseText);
+            }
+        });
+        return false;
+    });
+
     $(document).ready(function () {
+        document.getElementById('sent-message-form').style.display = 'none';
+        document.getElementById('sentMessageFormHide').style.display = 'none';
+
         if ($('#userId').text() == $('#loginUserId').text()) {
             document.getElementById("sentFriendRequest").style.display = 'none';
+            document.getElementById('sentMessageFormHide').style.display = 'none';
             document.getElementById("relationship-status").style.display = 'none';
+            document.getElementById('sentMessageFormDisplay').style.display = 'none';
         } else {
             document.getElementById("incomeRequests").style.display = 'none';
             document.getElementById("outcomeRequests").style.display = 'none';
-        }
-
-        if ($('#loginUserId').text() == '') {
-            document.getElementById("logout").style.display = 'none';
         }
     });
 

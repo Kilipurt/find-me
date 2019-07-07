@@ -19,7 +19,8 @@ public class Interceptor extends HandlerInterceptorAdapter {
         HttpSession session = request.getSession();
         User loggedInUser = (User) session.getAttribute("user");
 
-        if (loggedInUser != null || session.isNew() || request.getRequestURI().equals("/")) {
+        if (loggedInUser != null || session.isNew() || request.getRequestURI().equals("/")
+                || request.getRequestURI().equals("/login") || request.getRequestURI().equals("/user-registration")) {
             return true;
         }
 

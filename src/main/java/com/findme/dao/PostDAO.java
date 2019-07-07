@@ -16,14 +16,14 @@ public class PostDAO extends GeneralDAO<Post> {
     private Logger logger = Logger.getLogger(PostDAO.class);
 
     private static final String POST_BY_USER_PAGE_POSTED
-            = "SELECT * FROM POST WHERE POST.USER_PAGE_POSTED = :userPagePostedId";
+            = "SELECT * FROM POST WHERE USER_PAGE_POSTED = :userPagePostedId";
 
     private static final String POSTS_BY_PAGE_OWNER
-            = "SELECT * FROM POST WHERE POST.USER_POSTED = POST.USER_PAGE_POSTED " +
-            "AND POST.USER_PAGE_POSTED = :pageOwnerId AND POST.USER_POSTED = :pageOwnerId";
+            = "SELECT * FROM POST WHERE USER_POSTED = USER_PAGE_POSTED AND USER_PAGE_POSTED = :pageOwnerId " +
+            "AND USER_POSTED = :pageOwnerId";
 
     private static final String POSTS_BY_USER_POSTED
-            = "SELECT * FROM POST WHERE POST.USER_POSTED = :userPostedId AND POST.USER_PAGE_POSTED = :userPagePostedId";
+            = "SELECT * FROM POST WHERE USER_POSTED = :userPostedId AND USER_PAGE_POSTED = :userPagePostedId";
 
     private static final String POSTS_BY_FRIENDS
             = "SELECT * FROM POST P WHERE P.USER_PAGE_POSTED = :userPagePostedId AND P.USER_POSTED IN " +

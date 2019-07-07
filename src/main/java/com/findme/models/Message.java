@@ -12,6 +12,8 @@ public class Message {
     private Date dateRead;
     private User userFrom;
     private User userTo;
+    private Date dateEdited;
+    private Date dateDeleted;
 
     @Id
     @SequenceGenerator(name = "MES_SEQ", sequenceName = "MES_SEQ", allocationSize = 1)
@@ -48,6 +50,16 @@ public class Message {
         return userTo;
     }
 
+    @Column(name = "DATE_EDITED")
+    public Date getDateEdited() {
+        return dateEdited;
+    }
+
+    @Column(name = "DATE_DELETED")
+    public Date getDateDeleted() {
+        return dateDeleted;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -70,5 +82,27 @@ public class Message {
 
     public void setUserTo(User userTo) {
         this.userTo = userTo;
+    }
+
+    public void setDateEdited(Date dateEdited) {
+        this.dateEdited = dateEdited;
+    }
+
+    public void setDateDeleted(Date dateDeleted) {
+        this.dateDeleted = dateDeleted;
+    }
+
+    @Override
+    public String toString() {
+        return "Message{" +
+                "id=" + id +
+                ", text='" + text + '\'' +
+                ", dateSent=" + dateSent +
+                ", dateRead=" + dateRead +
+                ", userFrom=" + userFrom +
+                ", userTo=" + userTo +
+                ", dateEdited=" + dateEdited +
+                ", dateDeleted=" + dateDeleted +
+                '}';
     }
 }

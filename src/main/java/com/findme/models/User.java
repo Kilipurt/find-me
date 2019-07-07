@@ -19,15 +19,14 @@ public class User {
     private Integer age;
     private Date dateRegistered;
     private Date dateLastActive;
-    //TODO enum
     private String relationshipStatus;
     private String religion;
     //TODO from existed data
     private String school;
     private String university;
 
-    private List<Message> messagesSent;
-    private List<Message> messagesReceived;
+//    private List<Message> messagesSent;
+//    private List<Message> messagesReceived;
 
     //private String[] interests;
 
@@ -104,15 +103,15 @@ public class User {
         return university;
     }
 
-    @OneToMany(mappedBy = "userFrom")
-    public List<Message> getMessagesSent() {
-        return messagesSent;
-    }
-
-    @OneToMany(mappedBy = "userTo")
-    public List<Message> getMessagesReceived() {
-        return messagesReceived;
-    }
+//    @OneToMany(mappedBy = "userFrom")
+//    public List<Message> getMessagesSent() {
+//        return messagesSent;
+//    }
+//
+//    @OneToMany(mappedBy = "userTo")
+//    public List<Message> getMessagesReceived() {
+//        return messagesReceived;
+//    }
 
     public void setId(Long id) {
         this.id = id;
@@ -170,11 +169,11 @@ public class User {
         this.university = university;
     }
 
-    public void setMessagesSent(List<Message> messagesSent) {
-        this.messagesSent = messagesSent;
-    }
-
-    public void setMessagesReceived(List<Message> messagesReceived) {
-        this.messagesReceived = messagesReceived;
-    }
+//    public void setMessagesSent(List<Message> messagesSent) {
+//        this.messagesSent = messagesSent;
+//    }
+//
+//    public void setMessagesReceived(List<Message> messagesReceived) {
+//        this.messagesReceived = messagesReceived;
+//    }
 }

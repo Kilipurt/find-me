@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import javax.servlet.http.HttpSession;
-
 @Controller
 public class UserController {
 
@@ -22,7 +20,7 @@ public class UserController {
 
     private Logger logger = Logger.getLogger(UserController.class);
 
-    private static Long loginUserId;
+    private static User loginUser;
 
     @Autowired
     public UserController(UserService userService, RelationshipService relationshipService) {
@@ -30,12 +28,12 @@ public class UserController {
         this.relationshipService = relationshipService;
     }
 
-    public static Long getLoginUserId() {
-        return loginUserId;
+    public static User getLoginUser() {
+        return loginUser;
     }
 
-    public static void setLoginUserId(Long loginUserId) {
-        UserController.loginUserId = loginUserId;
+    public static void setLoginUser(User loginUser) {
+        UserController.loginUser = loginUser;
     }
 
     @RequestMapping(path = "/user/{userId}", method = RequestMethod.GET)
@@ -52,9 +50,9 @@ public class UserController {
 
         model.addAttribute("user", user);
 
-        if (loginUserId != null) {
-            model.addAttribute("loginUserId", loginUserId);
-            model.addAttribute("relationshipStatus", relationshipService.getRelationshipStatus(loginUserId, id));
+        if (loginUser != null) {
+            model.addAttribute("loginUser", loginUser);
+            model.addAttribute("relationshipStatus", relationshipService.getRelationshipStatus(loginUser.getId(), id));
         }
 
         return "profile";

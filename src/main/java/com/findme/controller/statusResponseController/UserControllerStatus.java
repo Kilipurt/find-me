@@ -1,5 +1,6 @@
 package com.findme.controller.statusResponseController;
 
+import com.findme.controller.viewResponseController.UserController;
 import com.findme.exception.BadRequestException;
 import com.findme.models.User;
 import com.findme.service.UserService;
@@ -41,7 +42,7 @@ public class UserControllerStatus {
 
         User user = userService.login(phone, password);
         session.setAttribute("user", user);
-        com.findme.controller.viewResponseController.UserController.setLoginUserId(user.getId());
+        UserController.setLoginUser(user);
         return new ResponseEntity<>(user.getId().toString(), HttpStatus.OK);
     }
 
@@ -53,7 +54,7 @@ public class UserControllerStatus {
         user.setDateLastActive(new Date());
         userService.update(user);
         session.invalidate();
-        com.findme.controller.viewResponseController.UserController.setLoginUserId(null);
+        UserController.setLoginUser(null);
         return new ResponseEntity<>("success", HttpStatus.OK);
     }
 

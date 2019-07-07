@@ -1,7 +1,6 @@
 package com.findme.controller.statusResponseController;
 
 import com.findme.exception.BadRequestException;
-import com.findme.exception.UnauthorizedException;
 import com.findme.models.Post;
 import com.findme.models.PostFilter;
 import com.findme.models.User;
@@ -41,14 +40,14 @@ public class PostControllerStatus {
     }
 
     @RequestMapping(path = "/add-post", method = RequestMethod.POST)
-    public ResponseEntity<String> addPost(HttpSession session, @ModelAttribute Post post) throws Exception {
+    public ResponseEntity<String> addPost(@ModelAttribute Post post) throws Exception {
         logger.info("PostController addPost method. Adding new post");
         postService.save(post);
         return new ResponseEntity<>("success", HttpStatus.OK);
     }
 
     @RequestMapping(path = "/get-posts", method = RequestMethod.GET)
-    public ResponseEntity<String> getPosts(HttpSession session, @ModelAttribute PostFilter postFilter)
+    public ResponseEntity<String> getPosts(@ModelAttribute PostFilter postFilter)
             throws Exception {
         logger.info("PostController getPosts method. Selecting posts by filter");
         List<Post> posts = postService.getPostsByFilter(postFilter);
@@ -67,7 +66,6 @@ public class PostControllerStatus {
         }
 
         postService.update(post);
-
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -85,7 +83,6 @@ public class PostControllerStatus {
         }
 
         postService.delete(Long.parseLong(postId));
-
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

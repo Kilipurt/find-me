@@ -1,8 +1,10 @@
 package com.findme.controller.responseHandler;
 
+import com.findme.controller.statusResponseController.MessageControllerStatus;
 import com.findme.controller.statusResponseController.PostControllerStatus;
 import com.findme.controller.statusResponseController.RelationshipControllerStatus;
 import com.findme.controller.statusResponseController.UserControllerStatus;
+import com.findme.controller.viewResponseController.MessageController;
 import com.findme.exception.BadRequestException;
 import com.findme.exception.InternalServerError;
 import com.findme.exception.NotFoundException;
@@ -14,7 +16,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.io.IOException;
 
-@RestControllerAdvice(assignableTypes = {PostControllerStatus.class, UserControllerStatus.class, RelationshipControllerStatus.class})
+@RestControllerAdvice(assignableTypes = {PostControllerStatus.class, UserControllerStatus.class,
+        RelationshipControllerStatus.class, MessageControllerStatus.class})
 public class StatusResponseHandler {
 
     @ExceptionHandler({BadRequestException.class, NumberFormatException.class})
