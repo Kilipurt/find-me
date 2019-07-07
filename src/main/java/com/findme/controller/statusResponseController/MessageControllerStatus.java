@@ -29,11 +29,7 @@ public class MessageControllerStatus {
         logger.info("MessageControllerStatus. send method. Send message.");
         User loggedInUser = (User) session.getAttribute("user");
 
-        if (!loggedInUser.getId().equals(message.getUserFrom().getId())) {
-            logger.error("MessageControllerStatus. send method. User " + loggedInUser.getId()
-                    + " does not have enough rights");
-            throw new BadRequestException("User " + loggedInUser.getId() + " does not have enough rights");
-        }
+        validateUserFrom(loggedInUser, message.getUserFrom());
 
         messageService.send(message);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -42,13 +38,10 @@ public class MessageControllerStatus {
     @RequestMapping(path = "/read-message", method = RequestMethod.PUT)
     public ResponseEntity<String> read(HttpSession session, @RequestBody Message message) throws Exception {
         logger.info("MessageControllerStatus. read method. Read message.");
+
         User loggedInUser = (User) session.getAttribute("user");
 
-        if (!loggedInUser.getId().equals(message.getUserFrom().getId())) {
-            logger.error("MessageControllerStatus. read method. User " + loggedInUser.getId()
-                    + " does not have enough rights");
-            throw new BadRequestException("User " + loggedInUser.getId() + " does not have enough rights");
-        }
+        validateUserFrom(loggedInUser, message.getUserFrom());
 
         messageService.read(message);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -57,13 +50,10 @@ public class MessageControllerStatus {
     @RequestMapping(path = "/edit-message", method = RequestMethod.PUT)
     public ResponseEntity<String> edit(HttpSession session, @RequestBody Message message) throws Exception {
         logger.info("MessageControllerStatus. edit method. edit message.");
+
         User loggedInUser = (User) session.getAttribute("user");
 
-        if (!loggedInUser.getId().equals(message.getUserFrom().getId())) {
-            logger.error("MessageControllerStatus. edit method. User " + loggedInUser.getId()
-                    + " does not have enough rights");
-            throw new BadRequestException("User " + loggedInUser.getId() + " does not have enough rights");
-        }
+        validateUserFrom(loggedInUser, message.getUserFrom());
 
         messageService.edit(message);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -73,15 +63,19 @@ public class MessageControllerStatus {
     public ResponseEntity<String> updateDateDeleted(HttpSession session, @RequestBody Message message)
             throws Exception {
         logger.info("MessageControllerStatus. updateDateDeleted method. Update date deleted of message.");
+
         User loggedInUser = (User) session.getAttribute("user");
 
-        if (!loggedInUser.getId().equals(message.getUserFrom().getId())) {
-            logger.error("MessageControllerStatus. edit method. User " + loggedInUser.getId()
-                    + " does not have enough rights");
-            throw new BadRequestException("User " + loggedInUser.getId() + " does not have enough rights");
-        }
+        validateUserFrom(loggedInUser, message.getUserFrom());
 
         messageService.updateDateDeleted(message);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    private void validateUserFrom(User loggedInUser, User userFrom) throws BadRequestException {
+        if (!loggedInUser.getId().equals(userFrom.getId())) {
+            logger.error("MessageControllerStatus. User " + loggedInUser.getId() + " does not have enough rights");
+            throw new BadRequestException("User " + loggedInUser.getId() + " does not have enough rights");
+        }
     }
 }
