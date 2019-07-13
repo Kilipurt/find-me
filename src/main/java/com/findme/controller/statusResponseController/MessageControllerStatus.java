@@ -8,9 +8,11 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 @RestController
 public class MessageControllerStatus {
@@ -24,12 +26,75 @@ public class MessageControllerStatus {
         this.messageService = messageService;
     }
 
+    @RequestMapping(path = "/delete-messages-for-both", method = RequestMethod.PUT)
+    public ResponseEntity<String> deleteMessagesForBoth(HttpSession session, @RequestParam String userId,
+                                                        @RequestBody List<Message> messages) throws Exception {
+        long id = Long.parseLong(userId);
+        User loggedInUser = (User) session.getAttribute("user");
+
+        validateUserId(id, loggedInUser.getId());
+
+        messageService.updateDateDeletedForList(messages);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @RequestMapping(path = "/delete-chat/", method = RequestMethod.PUT)
+    public ResponseEntity<String> deleteChat(HttpSession session, @RequestParam String loggedInUserId,
+                                             @RequestParam String userId) throws Exception {
+        long id = Long.parseLong(loggedInUserId);
+        User loggedInUser = (User) session.getAttribute("user");
+
+        validateUserId(id, loggedInUser.getId());
+
+        messageService.deleteChatForUser(id, Long.parseLong(userId));
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @RequestMapping(path = "/delete-messages", method = RequestMethod.PUT)
+    public ResponseEntity<String> deleteMessages(HttpSession session, @RequestParam String userId,
+                                                 @RequestBody List<Long> messagesId) throws Exception {
+        long id = Long.parseLong(userId);
+        User loggedInUser = (User) session.getAttribute("user");
+
+        validateUserId(id, loggedInUser.getId());
+
+        messageService.deleteMessagesForUser(id, messagesId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @RequestMapping(path = "/get-chats/{id}", method = RequestMethod.GET)
+    public ResponseEntity<String> getChats(HttpSession session, Model model, @PathVariable String id) throws Exception {
+        User loggedInUser = (User) session.getAttribute("user");
+        long userId = Long.parseLong(id);
+
+        validateUserId(userId, loggedInUser.getId());
+
+        model.addAttribute("users", messageService.getChatsByUserId(userId));
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @RequestMapping(path = "/get-messages", method = RequestMethod.GET)
+    public ResponseEntity<String> getMessages(@RequestParam String loggedInUserId, @RequestParam String userId,
+                                              @RequestParam String offset, HttpSession session, Model model)
+            throws Exception {
+        User loggedInUser = (User) session.getAttribute("user");
+        long id = Long.parseLong(loggedInUserId);
+
+        validateUserId(id, loggedInUser.getId());
+
+        long userIdLong = Long.parseLong(userId);
+        long offsetLong = Long.parseLong(offset);
+
+        model.addAttribute("messages", messageService.getMessagesByUsersId(id, userIdLong, offsetLong));
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @RequestMapping(path = "/send-message", method = RequestMethod.POST)
     public ResponseEntity<String> send(HttpSession session, @RequestBody Message message) throws Exception {
         logger.info("MessageControllerStatus. send method. Send message.");
         User loggedInUser = (User) session.getAttribute("user");
 
-        validateUserFrom(loggedInUser, message.getUserFrom());
+        validateUserId(loggedInUser.getId(), message.getUserFrom().getId());
 
         messageService.send(message);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -41,7 +106,7 @@ public class MessageControllerStatus {
 
         User loggedInUser = (User) session.getAttribute("user");
 
-        validateUserFrom(loggedInUser, message.getUserFrom());
+        validateUserId(loggedInUser.getId(), message.getUserFrom().getId());
 
         messageService.read(message);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -53,7 +118,7 @@ public class MessageControllerStatus {
 
         User loggedInUser = (User) session.getAttribute("user");
 
-        validateUserFrom(loggedInUser, message.getUserFrom());
+        validateUserId(loggedInUser.getId(), message.getUserFrom().getId());
 
         messageService.edit(message);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -66,16 +131,16 @@ public class MessageControllerStatus {
 
         User loggedInUser = (User) session.getAttribute("user");
 
-        validateUserFrom(loggedInUser, message.getUserFrom());
+        validateUserId(loggedInUser.getId(), message.getUserFrom().getId());
 
         messageService.updateDateDeleted(message);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    private void validateUserFrom(User loggedInUser, User userFrom) throws BadRequestException {
-        if (!loggedInUser.getId().equals(userFrom.getId())) {
-            logger.error("MessageControllerStatus. User " + loggedInUser.getId() + " does not have enough rights");
-            throw new BadRequestException("User " + loggedInUser.getId() + " does not have enough rights");
+    private void validateUserId(long loggedInUserId, long userFromId) throws BadRequestException {
+        if (loggedInUserId != userFromId) {
+            logger.error("MessageControllerStatus. User " + loggedInUserId + " does not have enough rights");
+            throw new BadRequestException("User " + loggedInUserId + " does not have enough rights");
         }
     }
 }

@@ -1,0 +1,55 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Find me</title>
+</head>
+<body>
+
+<div id="message">
+    <div th:if="${users.empty}">
+        <p>No Chats Available</p>
+    </div>
+    <div th:each="user : ${users}">
+        <span id="userId" th:text="${user.id}" hidden></span>
+        <span th:text="${user.firstName}"></span>
+        <span th:text="${user.lastName}"></span>
+        <button th:id="${user.id}" onclick="deleteChat(this.id)">Delete</button>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="/loggedInUser.js"></script>
+
+</body>
+
+<style>
+</style>
+
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            url: "/get-chats/" + loggedInUser.id,
+            type: "GET",
+            error: function error(xhr) {
+                alert(xhr.responseText);
+            }
+        });
+
+        return false;
+    });
+
+    function deleteChat(id) {
+        $.ajax({
+            url: "/delete-chat/",
+            type: "PUT",
+            data: {
+                "loggedInUser": loggedInUser.id,
+                "userId": id
+            },
+            error: function error(xhr) {
+                alert(xhr.responseText);
+            }
+        });
+    }
+</script>
+</html>

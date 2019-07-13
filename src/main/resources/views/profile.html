@@ -75,6 +75,8 @@
     </form>
     <button id="sentMessageFormHide" onclick="hideSentMessageForm()">Cancel</button>
 
+    <button onclick="getChats()">My chats</button>
+
     <p class="logout">
         <button id="logout" type="submit">Logout</button>
     </p>
@@ -84,6 +86,7 @@
 <!--<div th:replace="fragments/footer :: footer"/>-->
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="/loggedInUser.js"></script>
 </body>
 
 <style>
@@ -116,6 +119,10 @@
 </style>
 
 <script th:inline="javascript">
+    $(document).ready(function setLoggedInUser() {
+        loggedInUser = [[${loginUser}]];
+    });
+
     function displaySentMessageForm() {
         document.getElementById('sentMessageFormDisplay').style.display = 'none';
         document.getElementById('sent-message-form').style.display = 'block';
@@ -126,6 +133,10 @@
         document.getElementById('sent-message-form').style.display = 'none';
         document.getElementById('sentMessageFormHide').style.display = 'none';
         document.getElementById('sentMessageFormDisplay').style.display = 'block';
+    }
+
+    function getChats() {
+        window.location.replace("/chats/" + $('#loginUserId').text());
     }
 
     $('#sent-message-form').submit(function (e) {

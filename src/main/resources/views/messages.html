@@ -1,0 +1,55 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Find me</title>
+</head>
+<body>
+
+<div id="message">
+    <div th:if="${messages.empty}">
+        <p>No Messages Available</p>
+    </div>
+
+    <div th:each="message : ${messages}">
+        <input name="messages[]" th:value="${message.id}" type="checkbox"/>
+        <span th:text="${message.userFrom}"></span>
+        <span th:text="${message.text}"></span>
+        <span th:text="${message.dateSent}"></span>
+        <span th:text="${message.id}" hidden></span>
+        <span th:text="${message.dateRead}"></span>
+        <span th:text="${message.dateEdited}"></span>
+    </div>
+
+    <button type="submit" onclick="deleteMessages()">Delete messages</button>
+</div>
+
+<button type="submit" onclick="load()">Load more</button>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+</body>
+
+<style>
+</style>
+
+<script>
+    function deleteMessages() {
+        var checkedMessagesId = new Array();
+        $("input:checkbox[name=type]:checked").each(function(){
+            checkedMessagesId.push($(this).val());
+        });
+
+        $.ajax({
+            url: "/delete-messages",
+            type: "PUT",
+            data: {
+                "messagesId": JSON.stringify(checkedMessagesId),
+                "userId": loggedInUser.id
+            },
+            error: function (xhr) {
+                alert(xhr.responseText);
+            }
+        });
+    }
+</script>
+</html>

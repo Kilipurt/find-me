@@ -91,18 +91,4 @@ public class Message {
     public void setDateDeleted(Date dateDeleted) {
         this.dateDeleted = dateDeleted;
     }
-
-    @Override
-    public String toString() {
-        return "Message{" +
-                "id=" + id +
-                ", text='" + text + '\'' +
-                ", dateSent=" + dateSent +
-                ", dateRead=" + dateRead +
-                ", userFrom=" + userFrom +
-                ", userTo=" + userTo +
-                ", dateEdited=" + dateEdited +
-                ", dateDeleted=" + dateDeleted +
-                '}';
-    }
 }

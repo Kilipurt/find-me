@@ -25,9 +25,6 @@ public class User {
     private String school;
     private String university;
 
-//    private List<Message> messagesSent;
-//    private List<Message> messagesReceived;
-
     //private String[] interests;
 
     @Id
@@ -103,16 +100,6 @@ public class User {
         return university;
     }
 
-//    @OneToMany(mappedBy = "userFrom")
-//    public List<Message> getMessagesSent() {
-//        return messagesSent;
-//    }
-//
-//    @OneToMany(mappedBy = "userTo")
-//    public List<Message> getMessagesReceived() {
-//        return messagesReceived;
-//    }
-
     public void setId(Long id) {
         this.id = id;
     }
@@ -168,12 +155,4 @@ public class User {
     public void setUniversity(String university) {
         this.university = university;
     }
-
-//    public void setMessagesSent(List<Message> messagesSent) {
-//        this.messagesSent = messagesSent;
-//    }
-//
-//    public void setMessagesReceived(List<Message> messagesReceived) {
-//        this.messagesReceived = messagesReceived;
-//    }
 }
