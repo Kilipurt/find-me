@@ -7,6 +7,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.Query;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -14,64 +16,33 @@ import java.util.List;
 public class MessageDAO extends GeneralDAO<Message> {
 
     private static final String GET_CHATS_BY_USER_ID = "SELECT U.* FROM USERS U WHERE U.ID IN (SELECT M.USER_TO " +
-            "FROM MESSAGE M WHERE M.USER_FROM = :loggedInUserId AND M.DATE_DELETED IS NULL AND M.ID NOT IN " +
-            "(SELECT DM.MESSAGE_ID FROM DELETED_MESSAGES DM WHERE DM.USER_ID = :loggedInUserId)) OR U.ID IN " +
-            "(SELECT M.USER_FROM FROM MESSAGE M WHERE M.USER_TO = :loggedInUserId AND M.DATE_DELETED IS NULL " +
-            "AND M.ID NOT IN (SELECT DM.MESSAGE_ID FROM DELETED_MESSAGES DM WHERE DM.USER_ID = :loggedInUserId))";
+            "FROM MESSAGE M WHERE M.USER_FROM = :loggedInUserId AND M.DATE_DELETED IS NULL) OR U.ID IN " +
+            "(SELECT M.USER_FROM FROM MESSAGE M WHERE M.USER_TO = :loggedInUserId AND M.DATE_DELETED IS NULL)";
 
     private static final String GET_MESSAGES_BY_USERS_ID = "SELECT * FROM MESSAGE M WHERE " +
             "((M.USER_FROM = :firstUserId AND M.USER_TO = :secondUserId) OR (M.USER_FROM = :secondUserId AND " +
-            "M.USER_TO = :firstUserId)) AND M.DATE_DELETED IS NULL AND M.ID NOT IN (SELECT DM.MESSAGE_ID " +
-            "FROM DELETED_MESSAGES DM WHERE DM.USER_ID = :firstUserId) ORDER BY DATE_SENT ASC OFFSET :offset ROWS " +
+            "M.USER_TO = :firstUserId)) AND M.DATE_DELETED IS NULL ORDER BY DATE_SENT ASC OFFSET :offset ROWS " +
             "FETCH NEXT :messagesAmount ROWS ONLY";
 
-    private static final String GET_ALL_MESSAGES_BY_USERS_ID = "SELECT * FROM MESSAGE M WHERE " +
-            "((M.USER_FROM = :firstUserId AND M.USER_TO = :secondUserId) OR (M.USER_FROM = :secondUserId AND " +
-            "M.USER_TO = :firstUserId)) AND M.DATE_DELETED IS NULL AND M.ID NOT IN (SELECT DM.MESSAGE_ID " +
-            "FROM DELETED_MESSAGES DM WHERE DM.USER_ID = :firstUserId) ORDER BY DATE_SENT ASC";
-
-    private static final String DELETE_MESSAGE_FOR_USER = "INSERT INTO DELETED_MESSAGES VALUES(:userId, :messageId)";
+    private static final String DELETE_CHAT_BY_USERS_ID = "UPDATE MESSAGE M SET " +
+            "M.DATE_DELETED = TO_DATE(:dateDeleted, 'dd.MM.yyyy HH24:MI:SS') WHERE ((M.USER_FROM = :firstUserId AND " +
+            "M.USER_TO = :secondUserId) OR (M.USER_FROM = :secondUserId AND M.USER_TO = :firstUserId)) AND " +
+            "M.DATE_DELETED IS NULL";
 
     public MessageDAO() {
         setTypeParameterOfClass(Message.class);
     }
 
-    @Transactional(rollbackFor = Throwable.class)
     public void deleteChat(long loggedInUserId, long userId) throws InternalServerError {
         try {
-            List<Message> messages = getAllMessageByUsersId(loggedInUserId, userId);
-
-            for (Message message : messages) {
-                Query query = getEntityManager().createNativeQuery(DELETE_MESSAGE_FOR_USER);
-                query.setParameter("userId", loggedInUserId);
-                query.setParameter("messageId", message.getId());
-                query.executeUpdate();
-            }
-        } catch (Exception e) {
-            throw new InternalServerError("Deleting is failed");
-        }
-    }
-
-    private List<Message> getAllMessageByUsersId(long loggedInUserId, long userId) throws InternalServerError {
-        try {
-            Query query = getEntityManager().createNativeQuery(GET_ALL_MESSAGES_BY_USERS_ID, Message.class);
+            Query query = getEntityManager().createNativeQuery(DELETE_CHAT_BY_USERS_ID);
             query.setParameter("firstUserId", loggedInUserId);
             query.setParameter("secondUserId", userId);
-            return query.getResultList();
-        } catch (Exception e) {
-            throw new InternalServerError("Getting is failed");
-        }
-    }
 
-    @Transactional(rollbackFor = Throwable.class)
-    public void deleteMessageForUser(long userId, List<Long> messagesId) throws InternalServerError {
-        try {
-            for (long id : messagesId) {
-                Query query = getEntityManager().createNativeQuery(DELETE_MESSAGE_FOR_USER);
-                query.setParameter("userId", userId);
-                query.setParameter("messageId", id);
-                query.executeUpdate();
-            }
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+
+            query.setParameter("dateDeleted", dateFormat.format(new Date()));
+            query.executeUpdate();
         } catch (Exception e) {
             throw new InternalServerError("Deleting is failed");
         }
@@ -111,6 +82,7 @@ public class MessageDAO extends GeneralDAO<Message> {
             throw new InternalServerError("Updating is failed");
         }
     }
+
 
     @Override
     public Message save(Message obj) throws InternalServerError {

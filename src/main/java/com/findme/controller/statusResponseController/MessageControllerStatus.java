@@ -26,9 +26,9 @@ public class MessageControllerStatus {
         this.messageService = messageService;
     }
 
-    @RequestMapping(path = "/delete-messages-for-both", method = RequestMethod.PUT)
-    public ResponseEntity<String> deleteMessagesForBoth(HttpSession session, @RequestParam String userId,
-                                                        @RequestBody List<Message> messages) throws Exception {
+    @RequestMapping(path = "/delete-messages", method = RequestMethod.PUT)
+    public ResponseEntity<String> deleteMessages(HttpSession session, @RequestParam String userId,
+                                                 @RequestBody List<Message> messages) throws Exception {
         long id = Long.parseLong(userId);
         User loggedInUser = (User) session.getAttribute("user");
 
@@ -46,19 +46,7 @@ public class MessageControllerStatus {
 
         validateUserId(id, loggedInUser.getId());
 
-        messageService.deleteChatForUser(id, Long.parseLong(userId));
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    @RequestMapping(path = "/delete-messages", method = RequestMethod.PUT)
-    public ResponseEntity<String> deleteMessages(HttpSession session, @RequestParam String userId,
-                                                 @RequestBody List<Long> messagesId) throws Exception {
-        long id = Long.parseLong(userId);
-        User loggedInUser = (User) session.getAttribute("user");
-
-        validateUserId(id, loggedInUser.getId());
-
-        messageService.deleteMessagesForUser(id, messagesId);
+        messageService.deleteChat(id, Long.parseLong(userId));
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

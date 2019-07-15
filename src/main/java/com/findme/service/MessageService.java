@@ -27,31 +27,12 @@ public class MessageService {
         this.relationshipDAO = relationshipDAO;
     }
 
-    public void deleteChatForUser(long loggedInUserId, long userId) throws BadRequestException, InternalServerError {
-        if (userId < 0) {
+    public void deleteChat(long loggedInUserId, long userId) throws BadRequestException, InternalServerError {
+        if (userId <= 0) {
             throw new BadRequestException("Wrong id " + userId);
         }
 
         messageDAO.deleteChat(loggedInUserId, userId);
-    }
-
-    public void deleteMessagesForUser(long userId, List<Long> messagesId)
-            throws BadRequestException, InternalServerError {
-        if (messagesId.size() > 10) {
-            throw new BadRequestException("User can delete only 10 messages by step");
-        }
-
-        if (userId < 0) {
-            throw new BadRequestException("Wrong id " + userId);
-        }
-
-        for (long id : messagesId) {
-            if (id < 0) {
-                throw new BadRequestException("Wrong message id " + id);
-            }
-        }
-
-        messageDAO.deleteMessageForUser(userId, messagesId);
     }
 
     public void updateDateDeletedForList(List<Message> messages) throws BadRequestException, InternalServerError {
@@ -63,9 +44,7 @@ public class MessageService {
             if (message.getDateRead() != null) {
                 throw new BadRequestException("Message " + message.getId() + " already read");
             }
-        }
 
-        for (Message message : messages) {
             message.setDateDeleted(new Date());
         }
 
