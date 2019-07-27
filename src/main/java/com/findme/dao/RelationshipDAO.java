@@ -2,7 +2,7 @@ package com.findme.dao;
 
 import com.findme.exception.InternalServerError;
 import com.findme.models.Relationship;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,9 +11,8 @@ import javax.persistence.Query;
 
 @Repository
 @Transactional
+@Log4j
 public class RelationshipDAO extends GeneralDAO<Relationship> {
-
-    private Logger logger = Logger.getLogger(RelationshipDAO.class);
 
     private static final String GET_RELATIONSHIP_BY_USERS_ID
             = "SELECT * FROM RELATIONSHIP WHERE USER_FROM = :userIdFrom AND USER_TO = :userIdTo";
@@ -34,12 +33,12 @@ public class RelationshipDAO extends GeneralDAO<Relationship> {
     }
 
     public int getUserFriendsCount(long userId) throws InternalServerError {
-        logger.info("RelationshipDAO getUserFriendsCount method. Getting friends count of user " + userId);
+        log.info("RelationshipDAO getUserFriendsCount method. Getting friends count of user " + userId);
         return getByUserId(userId, GET_USER_FRIENDS_COUNT);
     }
 
     public int getOutcomeRequestsCount(long userId) throws InternalServerError {
-        logger.info("RelationshipDAO getOutcomeRequestsCount method. Getting outcome requests count of user " + userId);
+        log.info("RelationshipDAO getOutcomeRequestsCount method. Getting outcome requests count of user " + userId);
         return getByUserId(userId, GET_OUTCOME_REQUESTS_COUNT);
     }
 
@@ -49,13 +48,13 @@ public class RelationshipDAO extends GeneralDAO<Relationship> {
             query.setParameter("userId", userId);
             return Integer.parseInt(query.getSingleResult().toString());
         } catch (Exception e) {
-            logger.error("Getting is failed");
+            log.error("Getting is failed");
             throw new InternalServerError("Getting is failed");
         }
     }
 
     public Relationship getRelationshipByUsersId(long userIdFrom, long userIdTo) throws InternalServerError {
-        logger.info("RelationshipDAO getRelationshipByUsersId method. Selecting relationship between user " + userIdFrom
+        log.info("RelationshipDAO getRelationshipByUsersId method. Selecting relationship between user " + userIdFrom
                 + " and " + userIdTo);
 
         try {
@@ -66,13 +65,13 @@ public class RelationshipDAO extends GeneralDAO<Relationship> {
         } catch (NoResultException e) {
             return null;
         } catch (Exception e) {
-            logger.error("Getting is failed");
+            log.error("Getting is failed");
             throw new InternalServerError("Getting is failed");
         }
     }
 
     public Relationship getFriendRelationshipByUsersId(long firstUserId, long secondUserId) throws InternalServerError {
-        logger.info("RelationshipDAO getFriendRelationshipByUsersId method. Selecting friends relationship between " +
+        log.info("RelationshipDAO getFriendRelationshipByUsersId method. Selecting friends relationship between " +
                 "user " + firstUserId + " and " + secondUserId);
 
         try {
@@ -86,7 +85,7 @@ public class RelationshipDAO extends GeneralDAO<Relationship> {
 
             return (Relationship) query.getResultList().get(0);
         } catch (Exception e) {
-            logger.error("Getting is failed");
+            log.error("Getting is failed");
             throw new InternalServerError("Getting is failed");
         }
     }

@@ -2,16 +2,14 @@ package com.findme.controller;
 
 import com.findme.exception.UnauthorizedException;
 import com.findme.models.User;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+@Log4j
 public class Interceptor extends HandlerInterceptorAdapter {
-
-    private Logger logger = Logger.getLogger(Interceptor.class);
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
@@ -24,7 +22,7 @@ public class Interceptor extends HandlerInterceptorAdapter {
             return true;
         }
 
-        logger.error("User is not authorized");
+        log.error("User is not authorized");
         throw new UnauthorizedException("User is not authorized");
     }
 }

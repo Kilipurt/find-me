@@ -29,6 +29,11 @@ public class MessageDAO extends GeneralDAO<Message> {
             "M.USER_TO = :secondUserId) OR (M.USER_FROM = :secondUserId AND M.USER_TO = :firstUserId)) AND " +
             "M.DATE_DELETED IS NULL";
 
+    private static final String DELETE_MESSAGE = "UPDATE MESSAGE M SET M.DATE_DELETED = TO_DATE(:dateDeleted, " +
+            "'dd.MM.yyyy HH24:MI:SS') WHERE M.ID = :id";
+
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+
     public MessageDAO() {
         setTypeParameterOfClass(Message.class);
     }
@@ -38,9 +43,6 @@ public class MessageDAO extends GeneralDAO<Message> {
             Query query = getEntityManager().createNativeQuery(DELETE_CHAT_BY_USERS_ID);
             query.setParameter("firstUserId", loggedInUserId);
             query.setParameter("secondUserId", userId);
-
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-
             query.setParameter("dateDeleted", dateFormat.format(new Date()));
             query.executeUpdate();
         } catch (Exception e) {
@@ -73,10 +75,14 @@ public class MessageDAO extends GeneralDAO<Message> {
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public void updateDateDeletedForList(List<Message> messages) throws InternalServerError {
+    public void deleteMessages(List<Long> messagesId) throws InternalServerError {
         try {
-            for (Message message : messages) {
-                update(message);
+            Query query = getEntityManager().createNativeQuery(DELETE_MESSAGE);
+
+            for (long id : messagesId) {
+                query.setParameter("dateDeleted", dateFormat.format(new Date()));
+                query.setParameter("id", id);
+                query.executeUpdate();
             }
         } catch (Exception e) {
             throw new InternalServerError("Updating is failed");

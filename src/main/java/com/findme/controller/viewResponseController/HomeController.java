@@ -1,18 +1,17 @@
 package com.findme.controller.viewResponseController;
 
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
+@Log4j
 public class HomeController {
-
-    private Logger logger = Logger.getLogger(HomeController.class);
 
     @RequestMapping(path = "/", method = RequestMethod.GET)
     public String home() {
-        logger.info("HomeController home method.");
+        log.info("HomeController home method.");
         return "index";
     }
 }

@@ -3,11 +3,10 @@ package com.findme.service.updateRelationshipValidation;
 import com.findme.exception.BadRequestException;
 import com.findme.models.RelationshipStatus;
 import com.findme.models.ValidationData;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j;
 
+@Log4j
 public class LoggedInUserValidator extends GeneralValidator {
-
-    private Logger logger = Logger.getLogger(LoggedInUserValidator.class);
 
     public void validate(ValidationData validationData) throws Exception {
         long userIdTo =  validationData.getRelationship().getUserTo().getId();
@@ -31,7 +30,7 @@ public class LoggedInUserValidator extends GeneralValidator {
             validateNext(validationData);
         }
 
-        logger.error("LoggedInUserValidator validate method. User " + validationData.getLoggedInUser().getId()
+        log.error("LoggedInUserValidator validate method. User " + validationData.getLoggedInUser().getId()
                 + " has not enough rights");
         throw new BadRequestException("User " + validationData.getLoggedInUser().getId() + " has not enough rights");
     }

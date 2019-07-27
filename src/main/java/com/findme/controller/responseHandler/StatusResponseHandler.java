@@ -4,7 +4,6 @@ import com.findme.controller.statusResponseController.MessageControllerStatus;
 import com.findme.controller.statusResponseController.PostControllerStatus;
 import com.findme.controller.statusResponseController.RelationshipControllerStatus;
 import com.findme.controller.statusResponseController.UserControllerStatus;
-import com.findme.controller.viewResponseController.MessageController;
 import com.findme.exception.BadRequestException;
 import com.findme.exception.InternalServerError;
 import com.findme.exception.NotFoundException;

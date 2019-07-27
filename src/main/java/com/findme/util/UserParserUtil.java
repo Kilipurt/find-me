@@ -28,15 +28,4 @@ public class UserParserUtil {
         userMap.put("lastName", user.getLastName());
         return userMap;
     }
-
-//    public List<User> parseUsersFromString(String usersTagged) throws BadRequestException, InternalServerError {
-//        String[] usersTaggedStringArray = usersTagged.split(", ");
-//        List<User> usersTaggedList = new ArrayList<>();
-//
-//        for (String userTaggedId : usersTaggedStringArray) {
-//            usersTaggedList.add(userService.findById(Long.parseLong(userTaggedId)));
-//        }
-//
-//        return usersTaggedList;
-//    }
 }

@@ -1,75 +1,102 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
     <title>Find me</title>
 </head>
 <body>
 
-<h1>Welcome to Find me!</h1>
+<h1 class="title">Welcome to Find me!</h1>
 
-<form id="login-form">
-    <p>Login</p>
-    <input id="phoneField" name="phoneField" type="text" required>
+<div class="left">
+    <form id="login-form">
+        <p>Login</p>
+        <input id="phone" name="phone" type="text" required>
 
-    <p>Password</p>
-    <input id="passwordField" name="passwordField" type="text" required>
+        <p>Password</p>
+        <input id="password" name="password" type="text" required>
 
-    <p>
-        <button type="submit">Login</button>
-    </p>
-</form>
+        <p>
+            <button type="submit">Login</button>
+        </p>
+    </form>
 
-<form id="registration-form">
-    <p>*First name:</p>
-    <input type="text" name="firstName" required>
+    <button id="registration-button" onclick="registrationFormDisplay()">Registration</button>
+</div>
 
-    <p>*Last name:</p>
-    <input type="text" name="lastName" required>
+<div class="right">
+    <div id="info" class="info">Some info</div>
+    <form id="registration-form">
+        <div class="form-fields-wrap">
+            <div class="left-form-side">
+                <p>*First name:</p>
+                <input type="text" name="firstName" required>
 
-    <p>*Phone</p>
-    <input type="text" name="phone" required>
+                <p>*Last name:</p>
+                <input type="text" name="lastName" required>
 
-    <p>*Password</p>
-    <input type="text" name="password" required>
+                <p>*Phone</p>
+                <input type="text" name="phone" required>
 
-    <p>*Country:</p>
-    <input type="text" name="country" required>
+                <p>*Password</p>
+                <input type="text" name="password" required>
 
-    <p>*City:</p>
-    <input type="text" name="city" required>
+                <p>*Country:</p>
+                <input type="text" name="country" required>
 
-    <p>*Age:</p>
-    <input type="number" name="age" required>
+                <p>*City:</p>
+                <input type="text" name="city" required>
+            </div>
 
-    <p>Relationship status:</p>
-    <input type="text" name="relationshipStatus">
+            <div class="right-form-side">
+                <p>*Age:</p>
+                <input type="number" name="age" required>
 
-    <p>Religion:</p>
-    <input type="text" name="religion">
+                <p>Relationship status:</p>
+                <input type="text" name="relationshipStatus">
 
-    <p>School:</p>
-    <input type="text" name="school">
+                <p>Religion:</p>
+                <input type="text" name="religion">
 
-    <p>University:</p>
-    <input type="text" name="university">
+                <p>School:</p>
+                <input type="text" name="school">
 
-    <p>Fields, that was marked as *, are required</p>
+                <p>University:</p>
+                <input type="text" name="university">
+            </div>
+        </div>
 
-    <button type="submit">Register</button>
-</form>
+        <div class="submit-form">
+            <p>Fields, that was marked as *, are required</p>
+
+            <button type="submit">Register</button>
+        </div>
+    </form>
+</div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </body>
 
 <script>
+    $(document).ready(function (e) {
+        document.getElementById('registration-form').style.display = 'none';
+    });
+
+    function registrationFormDisplay() {
+        document.getElementById('registration-form').style.display = 'block';
+        document.getElementById('info').style.display = 'none';
+        document.getElementById('registration-button').style.display = 'none';
+    }
+
     $("#registration-form").submit(function (e) {
+        document.getElementById('registration-form').style.display = 'none';
+        document.getElementById('info').style.display = 'block';
+        document.getElementById('registration-button').style.display = 'block';
+
         $.ajax({
             url: "/user-registration",
             type: "POST",
             data: $('#registration-form').serialize(),
-            // success: function success(xhr) {
-            //     alert(xhr);
-            // },
             error: function error(xhr) {
                 alert(xhr.responseText);
             }
@@ -82,8 +109,8 @@
             url: "/login",
             type: "GET",
             data: {
-                phone: document.getElementById("phoneField").value,
-                password: document.getElementById("passwordField").value
+                phone: document.getElementById("phone").value,
+                password: document.getElementById("password").value
             },
             success: function success(xhr) {
                 window.location.replace("/user/" + xhr.toString());
@@ -95,5 +122,51 @@
         return false;
     });
 </script>
+
+<style>
+    body {
+        background-color: honeydew;
+    }
+
+    .left {
+        background-color: lightblue;
+        border: 2px solid cornflowerblue;
+        border-radius: 30px;
+        float: left;
+        margin: 20px;
+        padding: 20px;
+        position: absolute;
+        left: 100px;
+    }
+
+    .right {
+        overflow: auto;
+        margin: 20px;
+        padding: 20px;
+        position: absolute;
+        left: 400px;
+        background-color: lightblue;
+        border: 2px solid cornflowerblue;
+        border-radius: 30px;
+    }
+
+    .left-form-side {
+        float: left;
+        padding-right: 100px;
+    }
+
+    .right-form-side {
+        overflow: auto;
+        margin: 20px;
+    }
+
+    .submit-form {
+        padding-top: 50px;
+    }
+
+    .title, .header {
+        text-align: center;
+    }
+</style>
 
 </html>

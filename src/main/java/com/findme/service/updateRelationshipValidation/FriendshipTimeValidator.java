@@ -3,13 +3,12 @@ package com.findme.service.updateRelationshipValidation;
 import com.findme.exception.BadRequestException;
 import com.findme.models.RelationshipStatus;
 import com.findme.models.ValidationData;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j;
 
 import java.util.Date;
 
+@Log4j
 public class FriendshipTimeValidator extends GeneralValidator {
-
-    private Logger logger = Logger.getLogger(FriendshipTimeValidator.class);
 
     @Override
     public void validate(ValidationData validationData) throws Exception {
@@ -22,10 +21,10 @@ public class FriendshipTimeValidator extends GeneralValidator {
         int days = (int) (milliseconds / (24 * 60 * 60 * 1000));
 
         if (days < 3) {
-            logger.error("FriendshipTimeValidator validate method. Users must be friends at least 3 days in order to " +
-                    "updateDateDeleted this user from friends list");
+            log.error("FriendshipTimeValidator validate method. Users must be friends at least 3 days in order to " +
+                    "deleteSingleMessage this user from friends list");
             throw new BadRequestException("You must be friends at least 3 days " +
-                    "in order to updateDateDeleted this user from friends list");
+                    "in order to deleteSingleMessage this user from friends list");
         }
 
         validateNext(validationData);

@@ -78,7 +78,6 @@ public class AppConfig implements WebMvcConfigurer {
     private Properties additionalProperties() {
         Properties properties = new Properties();
         properties.setProperty("hibernate.dialect", "org.hibernate.dialect.Oracle10gDialect");
-
         return properties;
     }
 

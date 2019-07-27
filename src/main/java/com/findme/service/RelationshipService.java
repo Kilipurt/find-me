@@ -10,18 +10,18 @@ import com.findme.models.RelationshipStatus;
 import com.findme.models.User;
 import com.findme.models.ValidationData;
 import com.findme.service.updateRelationshipValidation.*;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
+@Log4j
 public class RelationshipService {
 
     private RelationshipDAO relationshipDAO;
     private UserDAO userDAO;
-    private Logger logger = Logger.getLogger(RelationshipService.class);
 
     @Autowired
     public RelationshipService(RelationshipDAO relationshipDAO, UserDAO userDAO) {
@@ -29,40 +29,36 @@ public class RelationshipService {
         this.userDAO = userDAO;
     }
 
-    public String getRelationshipStatus(long userIdFrom, long userIdTo) throws InternalServerError {
-        logger.info("RelationshipService getRelationshipStatus method. Selecting status of relationship between user "
+    public Relationship getRelationshipByUsersId(long userIdFrom, long userIdTo) throws InternalServerError {
+        log.info("RelationshipService getRelationshipStatus method. Selecting status of relationship between user "
                 + userIdFrom + " and " + userIdTo);
 
         if (userIdFrom == userIdTo) {
-            return "You are friend for yourself";
+            return null;
         }
 
         Relationship relationship = relationshipDAO.getRelationshipByUsersId(userIdFrom, userIdTo);
         relationship = relationship == null ? relationshipDAO.getRelationshipByUsersId(userIdTo, userIdFrom) : relationship;
 
-        if (relationship == null) {
-            return "Not friends";
-        }
-
-        return relationship.getStatus();
+        return relationship;
     }
 
     public Relationship save(long userIdFrom, long userIdTo) throws InternalServerError, BadRequestException {
-        logger.info("RelationshipService save method. Saving relationship between user " + userIdFrom + " and "
+        log.info("RelationshipService save method. Saving relationship between user " + userIdFrom + " and "
                 + userIdTo);
         validateUsersId(userIdFrom, userIdTo);
 
         User userTo = userDAO.findById(userIdTo);
 
         if (userTo == null) {
-            logger.error("RelationshipService save method. User who receives friend request does not exist");
+            log.error("RelationshipService save method. User who receives friend request does not exist");
             throw new BadRequestException("User who receives friend request does not exist");
         }
 
         Relationship relationship = relationshipDAO.getRelationshipByUsersId(userIdFrom, userIdTo);
 
         if (relationship != null) {
-            logger.error("RelationshipService save method. Relationship between users " + userIdFrom + " and "
+            log.error("RelationshipService save method. Relationship between users " + userIdFrom + " and "
                     + userIdTo + " already exists");
             throw new BadRequestException("Relationship between users " + userIdFrom + " and " + userIdTo
                     + " already exists");
@@ -81,7 +77,7 @@ public class RelationshipService {
 
     public Relationship update(long userIdFrom, long userIdTo, String status, User loggedInUser)
             throws InternalServerError, BadRequestException, UnauthorizedException {
-        logger.info("RelationshipService update method. Updating relationship between users " + userIdFrom + " and "
+        log.info("RelationshipService update method. Updating relationship between users " + userIdFrom + " and "
                 + userIdTo);
         validateUsersId(userIdFrom, userIdTo);
 
@@ -96,7 +92,7 @@ public class RelationshipService {
     }
 
     private void validateForSave(Relationship relationship) throws InternalServerError, BadRequestException {
-        logger.info("RelationshipService validateForSave method. Validating for saving relationship");
+        log.info("RelationshipService validateForSave method. Validating for saving relationship");
         ValidationData validationData = new ValidationData();
         validationData.setRelationship(relationship);
 
@@ -105,10 +101,10 @@ public class RelationshipService {
         try {
             maxFriendsValidator.validate(validationData);
         } catch (BadRequestException e) {
-            logger.error("RelationshipService validateForSave method. " + e.getMessage());
+            log.error("RelationshipService validateForSave method. " + e.getMessage());
             throw new BadRequestException(e.getMessage());
         } catch (Exception e) {
-            logger.error("RelationshipService validateForSave method. " + e.getMessage());
+            log.error("RelationshipService validateForSave method. " + e.getMessage());
             throw new InternalServerError(e.getMessage());
         }
     }
@@ -116,7 +112,7 @@ public class RelationshipService {
     private void validateForUpdate(String status, User loggedInUser, Relationship relationship)
             throws InternalServerError, BadRequestException, UnauthorizedException {
 
-        logger.info("RelationshipService validateForUpdate method. Validation for updating relationship");
+        log.info("RelationshipService validateForUpdate method. Validation for updating relationship");
         long userIdFrom = relationship.getUserFrom().getId();
         long userIdTo = relationship.getUserTo().getId();
 
@@ -137,33 +133,33 @@ public class RelationshipService {
         try {
             relationshipStatusValidator.validate(validationData);
         } catch (UnauthorizedException e) {
-            logger.error("RelationshipService validateForUpdate method. " + e.getMessage());
+            log.error("RelationshipService validateForUpdate method. " + e.getMessage());
             throw new UnauthorizedException(e.getMessage());
         } catch (BadRequestException e) {
-            logger.error("RelationshipService validateForUpdate method. " + e.getMessage());
+            log.error("RelationshipService validateForUpdate method. " + e.getMessage());
             throw new BadRequestException(e.getMessage());
         } catch (Exception e) {
-            logger.error("RelationshipService validateForUpdate method. " + e.getMessage());
+            log.error("RelationshipService validateForUpdate method. " + e.getMessage());
             throw new InternalServerError(e.getMessage());
         }
     }
 
     private void validateUsersId(long userIdFrom, long userIdTo) throws BadRequestException {
-        logger.info("RelationshipService validateUsersId method. Validating users id " + userIdFrom + " and "
+        log.info("RelationshipService validateUsersId method. Validating users id " + userIdFrom + " and "
                 + userIdTo);
 
         if (userIdFrom <= 0) {
-            logger.error("RelationshipService validateUsersId method. Wrong user's id " + userIdFrom);
+            log.error("RelationshipService validateUsersId method. Wrong user's id " + userIdFrom);
             throw new BadRequestException("Wrong user's id " + userIdFrom);
         }
 
         if (userIdTo <= 0) {
-            logger.error("RelationshipService validateUsersId method. Wrong user's id " + userIdTo);
+            log.error("RelationshipService validateUsersId method. Wrong user's id " + userIdTo);
             throw new BadRequestException("Wrong user's id " + userIdTo);
         }
 
         if (userIdFrom == userIdTo) {
-            logger.error("RelationshipService validateUsersId method. User " + userIdFrom + " can't sent request to " +
+            log.error("RelationshipService validateUsersId method. User " + userIdFrom + " can't sent request to " +
                     "himself");
             throw new BadRequestException("User " + userIdFrom + " can't sent request to himself");
         }

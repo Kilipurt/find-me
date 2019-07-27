@@ -6,20 +6,19 @@ import com.findme.exception.BadRequestException;
 import com.findme.exception.InternalServerError;
 import com.findme.models.Message;
 import com.findme.models.User;
+import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.apache.log4j.Logger;
 
 import java.util.Date;
 import java.util.List;
 
 @Service
+@Log4j
 public class MessageService {
 
     private MessageDAO messageDAO;
     private RelationshipDAO relationshipDAO;
-
-    private Logger logger = Logger.getLogger(MessageService.class);
 
     @Autowired
     public MessageService(MessageDAO messageDAO, RelationshipDAO relationshipDAO) {
@@ -35,20 +34,12 @@ public class MessageService {
         messageDAO.deleteChat(loggedInUserId, userId);
     }
 
-    public void updateDateDeletedForList(List<Message> messages) throws BadRequestException, InternalServerError {
-        if (messages.size() > 10) {
+    public void deleteMessages(List<Long> messagesId) throws BadRequestException, InternalServerError {
+        if (messagesId.size() > 10) {
             throw new BadRequestException("User can delete only 10 messages by step");
         }
 
-        for (Message message : messages) {
-            if (message.getDateRead() != null) {
-                throw new BadRequestException("Message " + message.getId() + " already read");
-            }
-
-            message.setDateDeleted(new Date());
-        }
-
-        messageDAO.updateDateDeletedForList(messages);
+        messageDAO.deleteMessages(messagesId);
     }
 
     public List<User> getChatsByUserId(long loggedInUserId) throws InternalServerError {
@@ -73,11 +64,11 @@ public class MessageService {
     }
 
     public Message send(Message message) throws BadRequestException, InternalServerError {
-        logger.info("MessageService. send method. Send message from user " + message.getUserFrom().getId() + " to user "
+        log.info("MessageService. send method. Send message from user " + message.getUserFrom().getId() + " to user "
                 + message.getUserTo().getId());
 
         if (message.getText().length() > 140) {
-            logger.error("MessageService. send method. Message " + message.getId() + " too long");
+            log.error("MessageService. send method. Message " + message.getId() + " too long");
             throw new BadRequestException("Message " + message.getId() + " too long");
         }
 
@@ -85,7 +76,7 @@ public class MessageService {
         long userToId = message.getUserTo().getId();
 
         if (relationshipDAO.getFriendRelationshipByUsersId(userFromId, userToId) == null) {
-            logger.error("MessageService. send method. You can send message only to friends");
+            log.error("MessageService. send method. You can send message only to friends");
             throw new BadRequestException("You can send message only to friends");
         }
 
@@ -94,10 +85,10 @@ public class MessageService {
     }
 
     public Message read(Message message) throws InternalServerError, BadRequestException {
-        logger.info("MessageService. read method. Read message " + message.getId());
+        log.info("MessageService. read method. Read message " + message.getId());
 
         if (message.getDateRead() != null) {
-            logger.error("MessageService. read method. Message " + message.getId() + " already read");
+            log.error("MessageService. read method. Message " + message.getId() + " already read");
             throw new BadRequestException("Message " + message.getId() + " already read");
         }
 
@@ -106,15 +97,15 @@ public class MessageService {
     }
 
     public Message edit(Message message) throws BadRequestException, InternalServerError {
-        logger.info("MessageService. edit method. Edit message " + message.getId());
+        log.info("MessageService. edit method. Edit message " + message.getId());
 
         if (message.getDateRead() != null) {
-            logger.error("MessageService. edit method. Message " + message.getId() + " was read");
+            log.error("MessageService. edit method. Message " + message.getId() + " was read");
             throw new BadRequestException("Message " + message.getId() + " was read");
         }
 
         if (message.getText().length() > 140) {
-            logger.error("MessageService. edit method. Message " + message.getId() + " too long");
+            log.error("MessageService. edit method. Message " + message.getId() + " too long");
             throw new BadRequestException("Message " + message.getId() + " too long");
         }
 
@@ -122,16 +113,16 @@ public class MessageService {
         return messageDAO.update(message);
     }
 
-    public void updateDateDeleted(Message message) throws BadRequestException, InternalServerError {
-        logger.info("MessageService. updateDateDeleted method. Delete message " + message.getId());
+    public void deleteSingleMessage(Message message) throws BadRequestException, InternalServerError {
+        log.info("MessageService. deleteSingleMessage method. Delete message " + message.getId());
 
         if (message.getDateRead() != null) {
-            logger.error("MessageService. updateDateDeleted method. Message " + message.getId() + " was read");
+            log.error("MessageService. deleteSingleMessage method. Message " + message.getId() + " was read");
             throw new BadRequestException("Message " + message.getId() + " was read");
         }
 
         if (message.getDateDeleted() != null) {
-            logger.error("MessageService. updateDateDeleted method. Message " + message.getId() + " already deleted");
+            log.error("MessageService. deleteSingleMessage method. Message " + message.getId() + " already deleted");
             throw new BadRequestException("Message " + message.getId() + " already deleted");
         }
 

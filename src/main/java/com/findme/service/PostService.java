@@ -5,7 +5,7 @@ import com.findme.dao.RelationshipDAO;
 import com.findme.exception.BadRequestException;
 import com.findme.exception.InternalServerError;
 import com.findme.models.*;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,12 +14,11 @@ import java.util.Date;
 import java.util.List;
 
 @Service
+@Log4j
 public class PostService {
 
     private PostDAO postDAO;
     private RelationshipDAO relationshipDAO;
-
-    private Logger logger = Logger.getLogger(PostService.class);
 
     @Autowired
     public PostService(PostDAO postDAO, RelationshipDAO relationshipDAO) {
@@ -30,11 +29,11 @@ public class PostService {
     public List<Post> getFriendsPostsWithOffset(long loggedInUserId, long offset)
             throws InternalServerError, BadRequestException {
 
-        logger.info("PostService getFriendsPostsWithOffset method. Selecting friends posts for user " + loggedInUserId
+        log.info("PostService getFriendsPostsWithOffset method. Selecting friends posts for user " + loggedInUserId
                 + " with offset " + offset);
 
         if (offset < 0) {
-            logger.error("PostService getFriendsPostsWithOffset method. Wrong offset " + offset);
+            log.error("PostService getFriendsPostsWithOffset method. Wrong offset " + offset);
             throw new BadRequestException("Wrong offset " + offset);
         }
 
@@ -44,7 +43,7 @@ public class PostService {
     public List<Post> getPostsByFilter(PostFilter postFilter)
             throws InternalServerError, BadRequestException {
 
-        logger.info("PostService getPostsByFilter method. Selecting posts by filter");
+        log.info("PostService getPostsByFilter method. Selecting posts by filter");
 
         if (postFilter.getType().equals(PostsFiltrationType.BY_FRIENDS)) {
             return getPostsByFriends(postFilter.getLoggedInUserId(), postFilter.getUserPagePostedId());
@@ -62,10 +61,10 @@ public class PostService {
     }
 
     public List<Post> getPostByPage(long userPagePostedId) throws InternalServerError, BadRequestException {
-        logger.info("PostService getPostByPage method. Selecting posts by page " + userPagePostedId);
+        log.info("PostService getPostByPage method. Selecting posts by page " + userPagePostedId);
 
         if (userPagePostedId <= 0) {
-            logger.error("PostService getPostByPage method. Wrong id " + userPagePostedId);
+            log.error("PostService getPostByPage method. Wrong id " + userPagePostedId);
             throw new BadRequestException("Wrong id " + userPagePostedId);
         }
 
@@ -79,11 +78,11 @@ public class PostService {
     public List<Post> getPostsByFriends(long loggedInUserId, long userPagePostedId)
             throws InternalServerError, BadRequestException {
 
-        logger.info("PostService getPostsByFriends method. Selecting posts by friends of user " + loggedInUserId
+        log.info("PostService getPostsByFriends method. Selecting posts by friends of user " + loggedInUserId
                 + " on page " + userPagePostedId);
 
         if (userPagePostedId <= 0) {
-            logger.error("PostService getPostsByFriends method. Wrong id " + userPagePostedId);
+            log.error("PostService getPostsByFriends method. Wrong id " + userPagePostedId);
             throw new BadRequestException("Wrong id " + userPagePostedId);
         }
 
@@ -95,10 +94,10 @@ public class PostService {
     }
 
     public List<Post> getPostsByPageOwner(long pageOwnerId) throws InternalServerError, BadRequestException {
-        logger.info("PostService getPostsByPageOwner method. Selecting posts by page owner " + pageOwnerId);
+        log.info("PostService getPostsByPageOwner method. Selecting posts by page owner " + pageOwnerId);
 
         if (pageOwnerId <= 0) {
-            logger.error("PostService getPostsByPageOwner method. Wrong id " + pageOwnerId);
+            log.error("PostService getPostsByPageOwner method. Wrong id " + pageOwnerId);
             throw new BadRequestException("Wrong id " + pageOwnerId);
         }
 
@@ -111,11 +110,11 @@ public class PostService {
 
     public List<Post> getPostsByUserPosted(long userPostedId, long userPagePostedId)
             throws InternalServerError, BadRequestException {
-        logger.info("PostService getPostsByUserPosted method. Selecting posts by user posted " + userPostedId
+        log.info("PostService getPostsByUserPosted method. Selecting posts by user posted " + userPostedId
                 + "on page " + userPagePostedId);
 
         if (userPostedId <= 0) {
-            logger.error("PostService getPostsByUserPosted method. Wrong id " + userPostedId);
+            log.error("PostService getPostsByUserPosted method. Wrong id " + userPostedId);
             throw new BadRequestException("Wrong id " + userPostedId);
         }
 
@@ -127,22 +126,22 @@ public class PostService {
     }
 
     public Post save(Post post) throws InternalServerError, BadRequestException {
-        logger.info("PostService save method. Saving post");
+        log.info("PostService save method. Saving post");
         validateForSave(post);
         post.setDatePosted(new Date());
         return postDAO.save(post);
     }
 
     public Post update(Post post) throws InternalServerError, BadRequestException {
-        logger.info("PostService update method. Updating post");
+        log.info("PostService update method. Updating post");
 
         if (post.getId() == null || findById(post.getId()) == null) {
-            logger.error("PostService update method. Post was not found");
+            log.error("PostService update method. Post was not found");
             throw new BadRequestException("Post was not found");
         }
 
         if (post.getMessage().length() > 200) {
-            logger.error("PostService update method. Max length for post is 200 characters");
+            log.error("PostService update method. Max length for post is 200 characters");
             throw new BadRequestException("Max length for post is 200 characters");
         }
 
@@ -150,10 +149,10 @@ public class PostService {
     }
 
     public void delete(long id) throws InternalServerError, BadRequestException {
-        logger.info("PostService updateDateDeleted method. Deleting post " + id);
+        log.info("PostService deleteSingleMessage method. Deleting post " + id);
 
         if (id <= 0) {
-            logger.error("PostService updateDateDeleted method. Wrong enter id " + id);
+            log.error("PostService deleteSingleMessage method. Wrong enter id " + id);
             throw new BadRequestException("Wrong enter id " + id);
         }
 
@@ -161,10 +160,10 @@ public class PostService {
     }
 
     public Post findById(long id) throws BadRequestException, InternalServerError {
-        logger.info("PostService findById method. Searching post " + id);
+        log.info("PostService findById method. Searching post " + id);
 
         if (id <= 0) {
-            logger.error("PostService findById method. Wrong enter id " + id);
+            log.error("PostService findById method. Wrong enter id " + id);
             throw new BadRequestException("Wrong enter id " + id);
         }
 
@@ -172,10 +171,10 @@ public class PostService {
     }
 
     private void validateForSave(Post post) throws BadRequestException, InternalServerError {
-        logger.info("PostService validateForSave method. Validating for saving post");
+        log.info("PostService validateForSave method. Validating for saving post");
 
         if (post.getMessage().length() > 200) {
-            logger.error("PostService validateForSave method. Max length for post is 200 characters");
+            log.error("PostService validateForSave method. Max length for post is 200 characters");
             throw new BadRequestException("Max length for post is 200 characters");
         }
 
@@ -187,7 +186,7 @@ public class PostService {
             Relationship relationship = relationshipDAO.getFriendRelationshipByUsersId(firstUserId, secondUserId);
 
             if (relationship == null) {
-                logger.error("PostService validateForSave method. User can not write post on not friend user's page");
+                log.error("PostService validateForSave method. User can not write post on not friend user's page");
                 throw new BadRequestException("User can not write post on not friend user's page");
             }
         }

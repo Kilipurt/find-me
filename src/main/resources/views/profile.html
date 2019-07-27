@@ -5,12 +5,42 @@
     <title>Find me</title>
 </head>
 <body>
+<div class="menu">
+    <a href="#" id="my-profile-btn">My profile</a>
+    <br>
 
-<!--<div th:replace="fragments/header :: header"/>-->
+    <a href="#" onclick="newsLoad()">News</a>
+    <br>
 
-<div>
+    <a href="#" onclick="getChats()">Chats</a>
+    <br>
+
+    <hr>
+    <a href="#" id="logout">Logout</a>
+</div>
+
+<div class="user-info">
     <div class="left">
-        <h1>Photo</h1>
+        <div class="photo">Photo</div>
+
+        <div class="relationship-status" id="relationship-status">
+            <p id="status-field" th:text="${relationship != null} ? ${relationship.status} : 'Not friend'"></p>
+        </div>
+
+        <p>
+            <button id="sentFriendRequest" type="submit">Add to friends</button>
+        </p>
+
+        <p>
+            <button id="sentMessageFormDisplay" onclick="displaySentMessageForm()">Sent message</button>
+        </p>
+
+        <form id="sent-message-form">
+            <p>Text:</p>
+            <input id="text" type="text" name="text"/>
+            <button type="submit">Send Message</button>
+        </form>
+        <button id="sentMessageFormHide" onclick="hideSentMessageForm()">Cancel</button>
     </div>
 
     <div class="right">
@@ -28,100 +58,194 @@
         <p class="userSchool" id="userSchool" th:text="${user.school}"></p>
         <p class="userUniversity" id="userUniversity" th:text="${user.university}"></p>
 
-        <p class="loginUserId" id="loginUserId" th:text="${loginUser.id}" hidden></p>
+        <hr>
+
+        <div class="requests">
+            <div class="incomeRequests" id="incomeRequests">
+                <h4>Income Requests</h4>
+            </div>
+
+            <div class="outcomeRequests" id="outcomeRequests">
+                <h4>Outcome Requests</h4>
+            </div>
+        </div>
     </div>
 
-    <!--<div class="post-div">-->
-    <!--<form id="post-form">-->
-    <!--<p>Message</p>-->
-    <!--<input id="postMessage" name="postMessage" type="text"/>-->
+    <hr>
 
-    <!--<p>Tagged users</p>-->
-    <!--<input id="taggedUsers" name="taggedUsers" type="text"/>-->
+    <div class="posts">
+        <div class="create-post-div">
+            <button id="post-form-display" onclick="displayPostForm()">New post</button>
 
-    <!--<p>Location</p>-->
-    <!--<input id="location" name="location" type="text"/>-->
+            <form id="post-form">
+                <p>Text</p>
+                <input id="postMessage" name="postMessage" type="text"/>
 
-    <!--<button type="submit">Create</button>-->
-    <!--</form>-->
-    <!--</div>-->
+                <form id="tagged-users-form">
+                    <p>Tagged users</p>
 
-    <button id="news-button" type="submit" onclick="newsLoad()">News</button>
+                    <input id="tagged-users-input" list="taggedUsers" name="taggedUsers"
+                           oninput="getFriendsByPattern()">
+                    <datalist id="taggedUsers">
+                        <th:block th:each="friend : ${friends}">
+                            <option th:value="${friend.firstName} ${friend.lastName}"></option>
+                        </th:block>
+                    </datalist>
 
-    <div class="relationship-status" id="relationship-status">
-        <p id="status-field" th:text="${relationshipStatus}"></p>
+                    <button type="submit">Tag</button>
+                </form>
+
+                <p>Location</p>
+                <input id="location" name="location" type="text"/>
+
+                <button type="submit">Create</button>
+            </form>
+
+            <button id="post-form-hide" onclick="hidePostForm()">Cancel</button>
+        </div>
     </div>
-
-    <div class="incomeRequests" id="incomeRequests">
-        <h4>Income Requests</h4>
-    </div>
-
-    <div class="outcomeRequests" id="outcomeRequests">
-        <h4>Outcome Requests</h4>
-    </div>
-
-    <p>
-        <button id="sentFriendRequest" type="submit">Add to friends</button>
-    </p>
-
-    <p>
-        <button id="sentMessageFormDisplay" onclick="displaySentMessageForm()">Sent message</button>
-    </p>
-
-    <form id="sent-message-form">
-        <p>Text:</p>
-        <input id="text" type="text" name="text"/>
-        <button type="submit">Send Message</button>
-    </form>
-    <button id="sentMessageFormHide" onclick="hideSentMessageForm()">Cancel</button>
-
-    <button onclick="getChats()">My chats</button>
-
-    <p class="logout">
-        <button id="logout" type="submit">Logout</button>
-    </p>
 </div>
-<!--/.container-->
-<!---->
-<!--<div th:replace="fragments/footer :: footer"/>-->
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<script src="/loggedInUser.js"></script>
 </body>
 
 <style>
-    .left {
+    body {
+        background-color: honeydew;
+    }
+
+    a {
+        font-weight: 700;
+        text-decoration: none;
+        border-radius: 3px;
+        background: inherit;
+        transition: 0.2s;
+        margin: 5px;
+    }
+
+    a:hover {
+        background: honeydew;
+    }
+
+    .menu {
+        background-color: lightblue;
+        border: 2px solid cornflowerblue;
+        border-radius: 30px;
         float: left;
+        padding: 20px;
+        margin: 40px 20px 20px 20px;
+        position: absolute;
+        left: 100px;
+        height: auto;
+    }
+
+    .menu ul {
+        list-style: none;
+    }
+
+    .menu ul li button {
+        display: block;
+        margin-top: 3px;
+        padding-left: 5px;
+        padding-top: 4px;
+        padding-bottom: 4px;
+    }
+
+    .photo {
+        text-align: center;
         width: 200px;
         height: 300px;
         border-style: solid;
     }
 
+    .user-info {
+        border: 2px solid cornflowerblue;
+        border-radius: 30px;
+        position: absolute;
+        left: 250px;
+        margin: 20px;
+    }
+
     .right {
-        margin-left: 300px;
+        margin: 20px;
+        padding: 20px;
     }
 
-    .btn {
-        margin-top: 230px;
-    }
-
-    .logout {
+    .left {
+        background-color: lightblue;
+        border: 2px solid cornflowerblue;
+        border-radius: 30px;
         float: left;
+        padding: 20px;
+        margin: 20px 50px 20px 20px;
     }
 
-    .userId {
-        display: none;
+    .right {
+        background-color: lightblue;
+        border: 2px solid cornflowerblue;
+        border-radius: 30px;
+        overflow: auto;
+        margin: 20px;
     }
 
-    .loginUserId {
+    .userId, .loginUserId {
         display: none;
     }
 </style>
 
 <script th:inline="javascript">
-    $(document).ready(function setLoggedInUser() {
-        loggedInUser = [[${loginUser}]];
+    var loggedInUser = JSON.parse(localStorage.getItem('user'));
+
+    $(document).ready(function () {
+        if (loggedInUser == null) {
+            loggedInUser = [[${user}]];
+            localStorage.setItem('user', JSON.stringify(loggedInUser));
+        }
     });
+
+    $(document).ready(function getRelationshipStatus() {
+        $.ajax({
+            url: "/get-relationship",
+            type: "GET",
+            data: {
+                loggedInUserId: loggedInUser.id,
+                userId: $('#userId').text()
+            }
+        });
+
+        return false;
+    });
+
+    $(document).ready(function (e) {
+        hidePostForm();
+        hideSentMessageForm();
+
+        if ($('#userId').text() == loggedInUser.id) {
+            document.getElementById("sentFriendRequest").style.display = 'none';
+            document.getElementById('sentMessageFormHide').style.display = 'none';
+            document.getElementById("relationship-status").style.display = 'none';
+            document.getElementById('sentMessageFormDisplay').style.display = 'none';
+        } else {
+            document.getElementById("incomeRequests").style.display = 'none';
+            document.getElementById("outcomeRequests").style.display = 'none';
+        }
+
+        if ($('#status-field').text() == 'FRIENDS') {
+            document.getElementById('sentFriendRequest').style.display = 'none';
+        }
+    });
+
+    function displayPostForm() {
+        document.getElementById('post-form').style.display = 'block';
+        document.getElementById('post-form-hide').style.display = 'block';
+        document.getElementById('post-form-display').style.display = 'none';
+    }
+
+    function hidePostForm() {
+        document.getElementById('post-form').style.display = 'none';
+        document.getElementById('post-form-hide').style.display = 'none';
+        document.getElementById('post-form-display').style.display = 'block';
+    }
 
     function displaySentMessageForm() {
         document.getElementById('sentMessageFormDisplay').style.display = 'none';
@@ -136,17 +260,25 @@
     }
 
     function getChats() {
-        window.location.replace("/chats/" + $('#loginUserId').text());
+        window.location.replace("/chats/" + loggedInUser.id);
     }
+
+    function newsLoad() {
+        window.location.replace("/feed/" + loggedInUser.id);
+    }
+
+    $('#my-profile-btn').click(function getProfile() {
+        window.location.replace('/user/' + loggedInUser.id);
+    });
 
     $('#sent-message-form').submit(function (e) {
         var userTo = [[${user}]];
-        var userFrom = [[${loginUser}]];
+        //var userFrom = [[${loginUser}]];
 
         var message = {
             text: document.getElementById('text').value,
             userTo: userTo,
-            userFrom: userFrom
+            userFrom: loggedInUser//userFrom
         };
 
         $.ajax({
@@ -166,25 +298,10 @@
         return false;
     });
 
-    $(document).ready(function () {
-        document.getElementById('sent-message-form').style.display = 'none';
-        document.getElementById('sentMessageFormHide').style.display = 'none';
-
-        if ($('#userId').text() == $('#loginUserId').text()) {
-            document.getElementById("sentFriendRequest").style.display = 'none';
-            document.getElementById('sentMessageFormHide').style.display = 'none';
-            document.getElementById("relationship-status").style.display = 'none';
-            document.getElementById('sentMessageFormDisplay').style.display = 'none';
-        } else {
-            document.getElementById("incomeRequests").style.display = 'none';
-            document.getElementById("outcomeRequests").style.display = 'none';
-        }
-    });
-
     $(document).ready(function (e) {
-        if ($('#userId').text() == $('#loginUserId').text()) {
+        if ($('#userId').text() == loggedInUser.id) {
             $.ajax({
-                url: "/income-requests/" + $('#loginUserId').text(),
+                url: "/income-requests/" + loggedInUser.id,
                 type: "GET",
                 success: function success(xhr) {
                     var incomeRequestsDiv = document.getElementById("incomeRequests");
@@ -223,9 +340,9 @@
     });
 
     $(document).ready(function (e) {
-        if ($('#userId').text() == $('#loginUserId').text()) {
+        if ($('#userId').text() == loggedInUser.id) {
             $.ajax({
-                url: "/outcome-requests/" + $('#loginUserId').text(),
+                url: "/outcome-requests/" + loggedInUser.id,
                 type: "GET",
                 success: function success(xhr) {
                     var outcomeRequestsDiv = document.getElementById("outcomeRequests");
@@ -260,6 +377,7 @@
             url: "/logout",
             type: "GET",
             success: function success(xhr) {
+                loggedInUser = null;
                 window.location.replace("/");
             },
             error: function error(xhr) {
@@ -275,7 +393,7 @@
                 url: "/add-relationship",
                 type: "POST",
                 data: {
-                    userIdFrom: $('#loginUserId').text(),
+                    userIdFrom: loggedInUser.id,
                     userIdTo: $('#userId').text()
                 },
                 success: function success(xhr) {
@@ -288,7 +406,7 @@
             return false;
         } else {
             var url = "/update-relationship?userIdTo=" + $('#userId').text() + "&userIdFrom="
-                + $('#loginUserId').text() + "&status=REQUEST_SENT";
+                + loggedInUser.id + "&status=REQUEST_SENT";
 
             updateRelationship(url)
         }
@@ -296,7 +414,7 @@
 
     function cancelRequest() {
         $.ajax({
-            url: "/update-relationship?userIdFrom=" + $('#loginUserId').text() + "&userIdTo="
+            url: "/update-relationship?userIdFrom=" + loggedInUser.id + "&userIdTo="
             + this.id.replace('cancelButton', '') + "&status=DELETED",
             type: 'PUT',
             success: function success(xhr) {
@@ -311,7 +429,7 @@
 
     function denyRequest() {
         $.ajax({
-            url: "/update-relationship?userIdTo=" + $('#loginUserId').text() + "&userIdFrom="
+            url: "/update-relationship?userIdTo=" + loggedInUser.id + "&userIdFrom="
             + this.id.replace('denyButton', '') + "&status=REQUEST_DECLINED",
             type: 'PUT',
             success: function success(xhr) {
@@ -325,7 +443,7 @@
     }
 
     function acceptRequest() {
-        var url = "/update-relationship?userIdTo=" + $('#loginUserId').text() + "&userIdFrom="
+        var url = "/update-relationship?userIdTo=" + loggedInUser.id + "&userIdFrom="
             + this.id.replace('acceptButton', '') + "&status=FRIENDS";
 
         updateRelationship(url);
@@ -352,22 +470,15 @@
             data: {
                 message: document.getElementById("postMessage").value,
                 usersTagged: document.getElementById("taggedUsers").value,
-                userPosted: $('#loginUserId').text(),
+                userPosted: loggedInUser.id,
                 userPagePosted: $('#userId').text(),
                 location: document.getElementById("location").value
             },
-            // success: function success(xhr) {
-            //     alert(xhr);
-            // },
             error: function error(xhr) {
                 alert(xhr.responseText);
             }
         });
         return false;
     });
-
-    function newsLoad() {
-        window.location.replace("/feed/" + $('#loginUserId').text());
-    }
 </script>
 </html>

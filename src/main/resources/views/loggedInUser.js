@@ -1,1 +1,0 @@
-var loggedInUser = new Object();

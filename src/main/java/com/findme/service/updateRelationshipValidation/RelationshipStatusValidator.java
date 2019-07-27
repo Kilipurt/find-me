@@ -3,11 +3,10 @@ package com.findme.service.updateRelationshipValidation;
 import com.findme.exception.BadRequestException;
 import com.findme.models.RelationshipStatus;
 import com.findme.models.ValidationData;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j;
 
+@Log4j
 public class RelationshipStatusValidator extends GeneralValidator {
-
-    private Logger logger = Logger.getLogger(RelationshipStatusValidator.class);
 
     public void validate(ValidationData validationData) throws Exception {
         String status = validationData.getStatus();
@@ -16,7 +15,7 @@ public class RelationshipStatusValidator extends GeneralValidator {
         long userIdTo = validationData.getRelationship().getUserTo().getId();
 
         if (validationData.getRelationship() == null) {
-            logger.error("Relationship between users " + userIdFrom + " and " + userIdTo + " is not exist");
+            log.error("Relationship between users " + userIdFrom + " and " + userIdTo + " is not exist");
             throw new BadRequestException("Relationship between users " + userIdFrom + " and " + userIdTo
                     + " is not exist");
         }
@@ -43,7 +42,7 @@ public class RelationshipStatusValidator extends GeneralValidator {
             validateNext(validationData);
         }
 
-        logger.error("RelationshipStatusValidator validate method. It's impossible to update relationship to the " +
+        log.error("RelationshipStatusValidator validate method. It's impossible to update relationship to the " +
                 "status " + validationData.getStatus());
         throw new BadRequestException("It's impossible to update relationship to the status "
                 + validationData.getStatus());
