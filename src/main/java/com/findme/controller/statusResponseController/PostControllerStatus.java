@@ -5,7 +5,7 @@ import com.findme.models.Post;
 import com.findme.models.PostFilter;
 import com.findme.models.User;
 import com.findme.service.PostService;
-import com.findme.util.PostJsonUtil;
+import com.findme.util.JsonUtil;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,28 +20,29 @@ import java.util.List;
 public class PostControllerStatus {
 
     private PostService postService;
-    private PostJsonUtil postJsonUtil;
+    private JsonUtil jsonUtil;
 
     @Autowired
-    public PostControllerStatus(PostService postService, PostJsonUtil postJsonUtil) {
+    public PostControllerStatus(PostService postService, JsonUtil jsonUtil) {
         this.postService = postService;
-        this.postJsonUtil = postJsonUtil;
+        this.jsonUtil = jsonUtil;
     }
 
     @RequestMapping(path = "/load", method = RequestMethod.GET)
-    public ResponseEntity<String> getFeed(HttpSession session, @RequestParam(value = "offset") String offset)
-            throws Exception {
+    public ResponseEntity<String> getFeed(HttpSession session, @RequestParam String offset) throws Exception {
         log.info("PostController getFeed method. Selecting news posts");
 
         User loggedInUser = (User) session.getAttribute("user");
+        long offsetLong = Long.parseLong(offset);
 
-        List<Post> posts = postService.getFriendsPostsWithOffset(loggedInUser.getId(), Long.parseLong(offset));
-        return new ResponseEntity<>(postJsonUtil.getJsonFromList(posts), HttpStatus.OK);
+        List<Post> friendsPosts = postService.getFriendsPostsWithOffset(loggedInUser.getId(), offsetLong);
+        return new ResponseEntity<>(jsonUtil.toJson(friendsPosts), HttpStatus.OK);
     }
 
     @RequestMapping(path = "/add-post", method = RequestMethod.POST)
     public ResponseEntity<String> addPost(@RequestBody Post post) throws Exception {
         log.info("PostController addPost method. Adding new post");
+
         postService.save(post);
         return new ResponseEntity<>("success", HttpStatus.OK);
     }
@@ -49,8 +50,9 @@ public class PostControllerStatus {
     @RequestMapping(path = "/get-posts", method = RequestMethod.GET)
     public ResponseEntity<String> getPosts(@RequestBody PostFilter postFilter) throws Exception {
         log.info("PostController getPosts method. Selecting posts by filter");
+
         List<Post> posts = postService.getPostsByFilter(postFilter);
-        return new ResponseEntity<>(postJsonUtil.getJsonFromList(posts), HttpStatus.OK);
+        return new ResponseEntity<>(jsonUtil.toJson(posts), HttpStatus.OK);
     }
 
     @RequestMapping(path = "/update-post", method = RequestMethod.PUT)
@@ -69,8 +71,8 @@ public class PostControllerStatus {
     }
 
     @RequestMapping(path = "/delete-post", method = RequestMethod.DELETE)
-    public ResponseEntity<String> deletePost(HttpSession session, @RequestParam String postId,
-                                             @RequestParam String userPostedId) throws Exception {
+    public ResponseEntity<String> deletePost(@RequestParam String userPostedId, @RequestParam String postId,
+                                             HttpSession session) throws Exception {
         log.info("PostController deletePost method. Deleting post");
 
         User loggedInUser = (User) session.getAttribute("user");

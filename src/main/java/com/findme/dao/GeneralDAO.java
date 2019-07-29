@@ -4,10 +4,13 @@ import com.findme.exception.InternalServerError;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j;
+import org.springframework.transaction.annotation.Transactional;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 @Log4j
+@Transactional
 public abstract class GeneralDAO<T> {
 
     @PersistenceContext

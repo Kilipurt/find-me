@@ -4,11 +4,11 @@ import com.findme.exception.BadRequestException;
 import com.findme.models.Message;
 import com.findme.models.User;
 import com.findme.service.MessageService;
+import com.findme.util.JsonUtil;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
@@ -19,10 +19,12 @@ import java.util.List;
 public class MessageControllerStatus {
 
     private MessageService messageService;
+    private JsonUtil jsonUtil;
 
     @Autowired
-    public MessageControllerStatus(MessageService messageService) {
+    public MessageControllerStatus(MessageService messageService, JsonUtil jsonUtil) {
         this.messageService = messageService;
+        this.jsonUtil = jsonUtil;
     }
 
     @RequestMapping(path = "/delete-messages", method = RequestMethod.PUT)
@@ -44,22 +46,22 @@ public class MessageControllerStatus {
     }
 
     @RequestMapping(path = "/get-chats", method = RequestMethod.GET)
-    public ResponseEntity<String> getChats(HttpSession session, Model model) throws Exception {
+    public ResponseEntity<String> getChats(HttpSession session) throws Exception {
         User loggedInUser = (User) session.getAttribute("user");
-        model.addAttribute("users", messageService.getChatsByUserId(loggedInUser.getId()));
-        return new ResponseEntity<>(HttpStatus.OK);
+        List<User> chats = messageService.getChatsByUserId(loggedInUser.getId());
+        return new ResponseEntity<>(jsonUtil.toJson(chats), HttpStatus.OK);
     }
 
     @RequestMapping(path = "/get-messages", method = RequestMethod.GET)
-    public ResponseEntity<String> getMessages(@RequestParam String userId, @RequestParam String offset, Model model,
+    public ResponseEntity<String> getMessages(@RequestParam String userId, @RequestParam String offset,
                                               HttpSession session) throws Exception {
         User loggedInUser = (User) session.getAttribute("user");
 
         long userIdLong = Long.parseLong(userId);
         long offsetLong = Long.parseLong(offset);
 
-        model.addAttribute("messages", messageService.getMessagesByUsersId(loggedInUser.getId(), userIdLong, offsetLong));
-        return new ResponseEntity<>(HttpStatus.OK);
+        List<Message> messages = messageService.getMessagesByUsersId(loggedInUser.getId(), userIdLong, offsetLong);
+        return new ResponseEntity<>(jsonUtil.toJson(messages), HttpStatus.OK);
     }
 
     @RequestMapping(path = "/send-message", method = RequestMethod.POST)

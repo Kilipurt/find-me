@@ -7,7 +7,6 @@ import lombok.Setter;
 @Setter
 public class ValidationData {
     private Relationship relationship;
-    private User loggedInUser;
     private String status;
     private int userFromFriendsCount;
     private int userToFriendsCount;

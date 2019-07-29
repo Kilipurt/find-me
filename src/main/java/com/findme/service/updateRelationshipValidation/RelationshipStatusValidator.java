@@ -44,6 +44,7 @@ public class RelationshipStatusValidator extends GeneralValidator {
 
         log.error("RelationshipStatusValidator validate method. It's impossible to update relationship to the " +
                 "status " + validationData.getStatus());
+
         throw new BadRequestException("It's impossible to update relationship to the status "
                 + validationData.getStatus());
     }

@@ -18,7 +18,7 @@
 <script>
     var loadNumber = 0;
 
-    $(document).ready(function (e) {
+    $(document).ready(function () {
         load();
     });
 
@@ -46,11 +46,11 @@
 
         var posts = JSON.parse(postsJson.toString());
 
-        for (var i = 0; i < posts.posts.length; i++) {
+        for (var i = 0; i < posts.length; i++) {
             var postDiv = document.createElement("div");
 
-            postDiv.insertAdjacentHTML("beforeEnd", posts.posts[i].message);
-            postsDiv.insertAdjacentElement("beforeEnd", postDiv);
+            postDiv.insertAdjacentHTML("beforeend", posts[i].message);
+            postsDiv.insertAdjacentElement("beforeend", postDiv);
 
             loadNumber++;
         }

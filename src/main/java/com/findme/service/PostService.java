@@ -9,7 +9,6 @@ import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -68,11 +67,7 @@ public class PostService {
             throw new BadRequestException("Wrong id " + userPagePostedId);
         }
 
-        List<Post> posts = postDAO.getPostsByPage(userPagePostedId);
-        posts.sort(new PostedDateComparator());
-        Collections.reverse(posts);
-
-        return posts;
+        return postDAO.getPostsByPage(userPagePostedId);
     }
 
     public List<Post> getPostsByFriends(long loggedInUserId, long userPagePostedId)
@@ -86,11 +81,7 @@ public class PostService {
             throw new BadRequestException("Wrong id " + userPagePostedId);
         }
 
-        List<Post> posts = postDAO.getPostsByFriends(loggedInUserId, userPagePostedId);
-        posts.sort(new PostedDateComparator());
-        Collections.reverse(posts);
-
-        return posts;
+        return postDAO.getPostsByFriends(loggedInUserId, userPagePostedId);
     }
 
     public List<Post> getPostsByPageOwner(long pageOwnerId) throws InternalServerError, BadRequestException {
@@ -101,11 +92,7 @@ public class PostService {
             throw new BadRequestException("Wrong id " + pageOwnerId);
         }
 
-        List<Post> posts = postDAO.getPostsByPageOwner(pageOwnerId);
-        posts.sort(new PostedDateComparator());
-        Collections.reverse(posts);
-
-        return posts;
+        return postDAO.getPostsByPageOwner(pageOwnerId);
     }
 
     public List<Post> getPostsByUserPosted(long userPostedId, long userPagePostedId)
@@ -118,11 +105,7 @@ public class PostService {
             throw new BadRequestException("Wrong id " + userPostedId);
         }
 
-        List<Post> posts = postDAO.getPostsByUserPosted(userPostedId, userPagePostedId);
-        posts.sort(new PostedDateComparator());
-        Collections.reverse(posts);
-
-        return posts;
+        return postDAO.getPostsByUserPosted(userPostedId, userPagePostedId);
     }
 
     public Post save(Post post) throws InternalServerError, BadRequestException {

@@ -15,7 +15,8 @@ import javax.persistence.Query;
 public class RelationshipDAO extends GeneralDAO<Relationship> {
 
     private static final String GET_RELATIONSHIP_BY_USERS_ID
-            = "SELECT * FROM RELATIONSHIP WHERE USER_FROM = :userIdFrom AND USER_TO = :userIdTo";
+            = "SELECT * FROM RELATIONSHIP WHERE (USER_FROM = :userIdFrom AND USER_TO = :userIdTo) OR " +
+            "(USER_FROM = :userIdTo AND USER_TO = :userIdFrom)";
 
     private static final String GET_FRIENDS_RELATIONSHIP_BY_USERS_ID
             = "SELECT * FROM RELATIONSHIP WHERE (USER_FROM = :firstUserId AND USER_TO = :secondUserId) " +
@@ -61,9 +62,12 @@ public class RelationshipDAO extends GeneralDAO<Relationship> {
             Query query = getEntityManager().createNativeQuery(GET_RELATIONSHIP_BY_USERS_ID, Relationship.class);
             query.setParameter("userIdFrom", userIdFrom);
             query.setParameter("userIdTo", userIdTo);
-            return (Relationship) query.getSingleResult();
-        } catch (NoResultException e) {
-            return null;
+
+            if (query.getResultList().size() == 0) {
+                return null;
+            }
+
+            return (Relationship) query.getResultList().get(0);
         } catch (Exception e) {
             log.error("Getting is failed");
             throw new InternalServerError("Getting is failed");

@@ -9,14 +9,14 @@
     <a href="#" id="my-profile-btn">My profile</a>
     <br>
 
-    <a href="#" onclick="newsLoad()">News</a>
+    <a href="#" id="get-feed-btn">News</a>
     <br>
 
-    <a href="#" onclick="getChats()">Chats</a>
+    <a href="#" id="get-chats-btn">Chats</a>
     <br>
 
     <hr>
-    <a href="#" id="logout">Logout</a>
+    <a href="#" id="logout-btn">Logout</a>
 </div>
 
 <div class="user-info">
@@ -24,23 +24,23 @@
         <div class="photo">Photo</div>
 
         <div class="relationship-status" id="relationship-status">
-            <p id="status-field" th:text="${relationship != null} ? ${relationship.status} : 'Not friend'"></p>
+            <p id="status-field"></p>
         </div>
 
         <p>
-            <button id="sentFriendRequest" type="submit">Add to friends</button>
+            <button id="send-friend-request-btn" type="submit">Add to friends</button>
         </p>
 
         <p>
-            <button id="sentMessageFormDisplay" onclick="displaySentMessageForm()">Sent message</button>
+            <button id="send-message-form-display-btn" onclick="displaySendMessageForm()">Sent message</button>
         </p>
 
-        <form id="sent-message-form">
+        <form id="send-message-form">
             <p>Text:</p>
             <input id="text" type="text" name="text"/>
             <button type="submit">Send Message</button>
         </form>
-        <button id="sentMessageFormHide" onclick="hideSentMessageForm()">Cancel</button>
+        <button id="hide-send-message-form-btn" onclick="hideSendMessageForm()">Cancel</button>
     </div>
 
     <div class="right">
@@ -61,11 +61,11 @@
         <hr>
 
         <div class="requests">
-            <div class="incomeRequests" id="incomeRequests">
+            <div class="income-requests" id="income-requests">
                 <h4>Income Requests</h4>
             </div>
 
-            <div class="outcomeRequests" id="outcomeRequests">
+            <div class="outcome-requests" id="outcome-requests">
                 <h4>Outcome Requests</h4>
             </div>
         </div>
@@ -75,17 +75,17 @@
 
     <div class="posts">
         <div class="create-post-div">
-            <button id="post-form-display" onclick="displayPostForm()">New post</button>
+            <button id="display-post-form-btn" onclick="displayPostForm()">New post</button>
 
             <form id="post-form">
                 <p>Text</p>
-                <input id="postMessage" name="postMessage" type="text"/>
+                <input id="post-message" name="post-message" type="text"/>
 
                 <form id="tagged-users-form">
                     <p>Tagged users</p>
 
                     <input id="tagged-users-input" list="taggedUsers" name="taggedUsers"
-                           oninput="getFriendsByPattern()">
+                    <!--oninput="getFriendsByPattern()"-->>
                     <datalist id="taggedUsers">
                         <th:block th:each="friend : ${friends}">
                             <option th:value="${friend.firstName} ${friend.lastName}"></option>
@@ -101,7 +101,7 @@
                 <button type="submit">Create</button>
             </form>
 
-            <button id="post-form-hide" onclick="hidePostForm()">Cancel</button>
+            <button id="hide-post-form-btn" onclick="hidePostForm()">Cancel</button>
         </div>
     </div>
 </div>
@@ -208,77 +208,95 @@
             url: "/get-relationship",
             type: "GET",
             data: {
-                loggedInUserId: loggedInUser.id,
                 userId: $('#userId').text()
+            },
+            success: function (xhr) {
+                var relationship = JSON.parse(xhr);
+                $('#status-field').text(relationship.status);
             }
         });
 
         return false;
     });
 
-    $(document).ready(function (e) {
+    $(document).ready(function () {
         hidePostForm();
-        hideSentMessageForm();
+        hideSendMessageForm();
 
         if ($('#userId').text() == loggedInUser.id) {
-            document.getElementById("sentFriendRequest").style.display = 'none';
-            document.getElementById('sentMessageFormHide').style.display = 'none';
+            document.getElementById("send-friend-request-btn").style.display = 'none';
+            document.getElementById('hide-send-message-form-btn').style.display = 'none';
             document.getElementById("relationship-status").style.display = 'none';
-            document.getElementById('sentMessageFormDisplay').style.display = 'none';
+            document.getElementById('send-message-form-display-btn').style.display = 'none';
         } else {
-            document.getElementById("incomeRequests").style.display = 'none';
-            document.getElementById("outcomeRequests").style.display = 'none';
+            document.getElementById("income-requests").style.display = 'none';
+            document.getElementById("outcome-requests").style.display = 'none';
         }
 
         if ($('#status-field').text() == 'FRIENDS') {
-            document.getElementById('sentFriendRequest').style.display = 'none';
+            document.getElementById('send-friend-request-btn').style.display = 'none';
         }
     });
 
     function displayPostForm() {
         document.getElementById('post-form').style.display = 'block';
-        document.getElementById('post-form-hide').style.display = 'block';
-        document.getElementById('post-form-display').style.display = 'none';
+        document.getElementById('hide-post-form-btn').style.display = 'block';
+        document.getElementById('display-post-form-btn').style.display = 'none';
     }
 
     function hidePostForm() {
         document.getElementById('post-form').style.display = 'none';
-        document.getElementById('post-form-hide').style.display = 'none';
-        document.getElementById('post-form-display').style.display = 'block';
+        document.getElementById('hide-post-form-btn').style.display = 'none';
+        document.getElementById('display-post-form-btn').style.display = 'block';
     }
 
-    function displaySentMessageForm() {
-        document.getElementById('sentMessageFormDisplay').style.display = 'none';
-        document.getElementById('sent-message-form').style.display = 'block';
-        document.getElementById('sentMessageFormHide').style.display = 'block';
+    function displaySendMessageForm() {
+        document.getElementById('send-message-form-display-btn').style.display = 'none';
+        document.getElementById('send-message-form').style.display = 'block';
+        document.getElementById('hide-send-message-form-btn').style.display = 'block';
     }
 
-    function hideSentMessageForm() {
-        document.getElementById('sent-message-form').style.display = 'none';
-        document.getElementById('sentMessageFormHide').style.display = 'none';
-        document.getElementById('sentMessageFormDisplay').style.display = 'block';
+    function hideSendMessageForm() {
+        document.getElementById('send-message-form').style.display = 'none';
+        document.getElementById('hide-send-message-form-btn').style.display = 'none';
+        document.getElementById('send-message-form-display-btn').style.display = 'block';
     }
 
-    function getChats() {
+    $('#get-chats-btn').on('click', function getChats() {
         window.location.replace("/chats/" + loggedInUser.id);
-    }
+    });
 
-    function newsLoad() {
+    $('#get-feed-btn').on('click', function getFeed() {
         window.location.replace("/feed/" + loggedInUser.id);
-    }
+    });
 
-    $('#my-profile-btn').click(function getProfile() {
+    $('#my-profile-btn').on('click', function getProfile() {
         window.location.replace('/user/' + loggedInUser.id);
     });
 
-    $('#sent-message-form').submit(function (e) {
+    $('#logout').on('click', function () {
+        $.ajax({
+            url: "/logout",
+            type: "GET",
+            success: function success() {
+                loggedInUser = null;
+                window.location.replace("/");
+            },
+            error: function error(xhr) {
+                alert(xhr.responseText);
+            }
+        });
+
+        return false;
+    });
+
+    $('#send-message-form').on('submit', function (e) {
         var userTo = [[${user}]];
-        //var userFrom = [[${loginUser}]];
 
         var message = {
             text: document.getElementById('text').value,
             userTo: userTo,
-            userFrom: loggedInUser//userFrom
+            userFrom: loggedInUser
         };
 
         $.ajax({
@@ -287,46 +305,40 @@
             data: JSON.stringify(message),
             dataType: "json",
             contentType: "application/json",
-            success: function success(xhr) {
-                hideSentMessageForm();
+            success: function success() {
+                hideSendMessageForm();
                 alert("Message sent successfully");
             },
             error: function error(xhr) {
                 alert(xhr.responseText);
             }
         });
+
         return false;
     });
 
-    $(document).ready(function (e) {
+    $(document).ready(function () {
         if ($('#userId').text() == loggedInUser.id) {
             $.ajax({
-                url: "/income-requests/" + loggedInUser.id,
+                url: "/income-requests",
                 type: "GET",
                 success: function success(xhr) {
-                    var incomeRequestsDiv = document.getElementById("incomeRequests");
-
+                    var incomeRequestsDiv = document.getElementById("income-requests");
                     var users = JSON.parse(xhr.toString());
-
-                    for (var i = 0; i < users.users.length; i++) {
+                    for (var i = 0; i < users.length; i++) {
                         var aloneRequestDiv = document.createElement("div");
-
-                        aloneRequestDiv.innerHTML = users.users[i].id + " "
-                            + users.users[i].firstName + " "
-                            + users.users[i].lastName + " ";
-
+                        aloneRequestDiv.innerHTML = users[i].id + " "
+                            + users[i].firstName + " "
+                            + users[i].lastName + " ";
                         var denyButton = document.createElement("button");
                         denyButton.innerHTML = "Deny request";
-                        denyButton.id = "denyButton" + users.users[i].id;
+                        denyButton.id = "denyButton" + users[i].id;
                         denyButton.addEventListener("click", denyRequest);
-
                         aloneRequestDiv.insertAdjacentElement("beforeEnd", denyButton);
-
                         var acceptButton = document.createElement("button");
                         acceptButton.innerHTML = "Accept request";
-                        acceptButton.id = "acceptButton" + users.users[i].id;
+                        acceptButton.id = "acceptButton" + users[i].id;
                         acceptButton.addEventListener("click", acceptRequest);
-
                         aloneRequestDiv.insertAdjacentElement("beforeEnd", acceptButton);
                         incomeRequestsDiv.insertAdjacentElement("beforeEnd", aloneRequestDiv);
                     }
@@ -339,27 +351,23 @@
         return false;
     });
 
-    $(document).ready(function (e) {
+    $(document).ready(function () {
         if ($('#userId').text() == loggedInUser.id) {
             $.ajax({
-                url: "/outcome-requests/" + loggedInUser.id,
+                url: "/outcome-requests",
                 type: "GET",
                 success: function success(xhr) {
-                    var outcomeRequestsDiv = document.getElementById("outcomeRequests");
+                    var outcomeRequestsDiv = document.getElementById("outcome-requests");
                     var users = JSON.parse(xhr.toString());
-
-                    for (var i = 0; i < users.users.length; i++) {
+                    for (var i = 0; i < users.length; i++) {
                         var aloneRequestDiv = document.createElement("div");
-
-                        aloneRequestDiv.innerHTML = users.users[i].id + " "
-                            + users.users[i].firstName + " "
-                            + users.users[i].lastName + " ";
-
+                        aloneRequestDiv.innerHTML = users[i].id + " "
+                            + users[i].firstName + " "
+                            + users[i].lastName + " ";
                         var cancelButton = document.createElement("button");
                         cancelButton.innerHTML = "Cancel request";
-                        cancelButton.id = "cancelButton" + users.users[i].id;
+                        cancelButton.id = "cancelButton" + users[i].id;
                         cancelButton.addEventListener("click", cancelRequest);
-
                         aloneRequestDiv.insertAdjacentElement("beforeEnd", cancelButton);
                         outcomeRequestsDiv.insertAdjacentElement("beforeEnd", aloneRequestDiv);
                     }
@@ -372,31 +380,15 @@
         return false;
     });
 
-    $('#logout').on("click", function (e) {
-        $.ajax({
-            url: "/logout",
-            type: "GET",
-            success: function success(xhr) {
-                loggedInUser = null;
-                window.location.replace("/");
-            },
-            error: function error(xhr) {
-                alert(xhr.responseText);
-            }
-        });
-        return false;
-    });
-
-    $('#sentFriendRequest').on("click", function (e) {
+    $('#send-friend-request-btn').on("click", function () {
         if ($('#status-field').text() == 'Not friends') {
             $.ajax({
                 url: "/add-relationship",
                 type: "POST",
                 data: {
-                    userIdFrom: loggedInUser.id,
                     userIdTo: $('#userId').text()
                 },
-                success: function success(xhr) {
+                success: function success() {
                     alert("Request sent successfully");
                 },
                 error: function error(xhr) {
@@ -405,79 +397,60 @@
             });
             return false;
         } else {
-            var url = "/update-relationship?userIdTo=" + $('#userId').text() + "&userIdFrom="
-                + loggedInUser.id + "&status=REQUEST_SENT";
+            var url = "/update-relationship?userIdTo=" + $('#userId').text() + "&status=REQUEST_SENT";
 
-            updateRelationship(url)
+            updateRelationship(url);
         }
     });
 
     function cancelRequest() {
-        $.ajax({
-            url: "/update-relationship?userIdFrom=" + loggedInUser.id + "&userIdTo="
-            + this.id.replace('cancelButton', '') + "&status=DELETED",
-            type: 'PUT',
-            success: function success(xhr) {
-                alert("success");
-            },
-            error: function error(xhr) {
-                alert(xhr.responseText);
-            }
-        });
-        return false;
+        updateRelationship("/update-relationship?&userIdTo=" + this.id.replace('cancelButton', '') + "&status=DELETED");
     }
 
     function denyRequest() {
-        $.ajax({
-            url: "/update-relationship?userIdTo=" + loggedInUser.id + "&userIdFrom="
-            + this.id.replace('denyButton', '') + "&status=REQUEST_DECLINED",
-            type: 'PUT',
-            success: function success(xhr) {
-                alert("success");
-            },
-            error: function error(xhr) {
-                alert(xhr.responseText);
-            }
-        });
-        return false;
+        updateRelationship("/update-relationship?userIdTo=" + this.id.replace('denyButton', '') + "&status=REQUEST_DECLINED");
     }
 
     function acceptRequest() {
-        var url = "/update-relationship?userIdTo=" + loggedInUser.id + "&userIdFrom="
-            + this.id.replace('acceptButton', '') + "&status=FRIENDS";
-
-        updateRelationship(url);
+        updateRelationship("/update-relationship?userIdTo=" + this.id.replace('acceptButton', '') + "&status=FRIENDS");
     }
 
     function updateRelationship(url) {
         $.ajax({
             url: url,
             type: 'PUT',
-            success: function success(xhr) {
+            success: function success() {
                 alert("success");
             },
             error: function error(xhr) {
                 alert(xhr.responseText);
             }
         });
+
         return false;
     }
 
-    $("#post-form").submit(function (e) {
+    $("#post-form").on('submit', function () {
+        //TODO users tagged
+        var post = {
+            message: document.getElementById("post-message").value,
+            usersTagged: document.getElementById("taggedUsers").value,
+            userPosted: loggedInUser.id,
+            userPagePosted: $('#userId').text(),
+            location: document.getElementById("location").value
+        };
+
         $.ajax({
             url: "/add-post",
             type: "POST",
-            data: {
-                message: document.getElementById("postMessage").value,
-                usersTagged: document.getElementById("taggedUsers").value,
-                userPosted: loggedInUser.id,
-                userPagePosted: $('#userId').text(),
-                location: document.getElementById("location").value
-            },
+            data: JSON.stringify(post),
+            dataType: "json",
+            contentType: "application/json",
             error: function error(xhr) {
                 alert(xhr.responseText);
             }
         });
+
         return false;
     });
 </script>

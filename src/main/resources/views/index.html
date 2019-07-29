@@ -21,11 +21,10 @@
         </p>
     </form>
 
-    <button id="registration-button" onclick="registrationFormDisplay()">Registration</button>
+    <button id="registration-button" onclick="displayRegistrationForm()">Registration</button>
 </div>
 
 <div class="right">
-    <div id="info" class="info">Some info</div>
     <form id="registration-form">
         <div class="form-fields-wrap">
             <div class="left-form-side">
@@ -70,25 +69,33 @@
             <p>Fields, that was marked as *, are required</p>
 
             <button type="submit">Register</button>
+
+            <button onclick="hideRegistrationForm()">Cancel</button>
         </div>
     </form>
+
+    <div id="info" class="info">Some info</div>
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </body>
 
 <script>
-    $(document).ready(function (e) {
+    $(document).ready(function () {
         document.getElementById('registration-form').style.display = 'none';
     });
 
-    function registrationFormDisplay() {
+    function displayRegistrationForm() {
         document.getElementById('registration-form').style.display = 'block';
-        document.getElementById('info').style.display = 'none';
         document.getElementById('registration-button').style.display = 'none';
     }
 
-    $("#registration-form").submit(function (e) {
+    function hideRegistrationForm() {
+        document.getElementById('registration-form').style.display = 'none';
+        document.getElementById('registration-button').style.display = 'block';
+    }
+
+    $("#registration-form").on('submit', function () {
         document.getElementById('registration-form').style.display = 'none';
         document.getElementById('info').style.display = 'block';
         document.getElementById('registration-button').style.display = 'block';
@@ -104,7 +111,7 @@
         return false;
     });
 
-    $('#login-form').submit(function (e) {
+    $('#login-form').on('submit', function () {
         $.ajax({
             url: "/login",
             type: "GET",
