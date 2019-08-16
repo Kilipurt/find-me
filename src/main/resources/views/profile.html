@@ -45,17 +45,41 @@
 
     <div class="right">
         <p class="userId" id="userId" th:text="${user.id}"></p>
+
+        <label for="userFirstName">First name: </label>
         <p class="userFirstName" id="userFirstName" th:text="${user.firstName}"></p>
+
+        <label for="userLastName">Last name: </label>
         <p class="userLastName" id="userLastName" th:text="${user.lastName}"></p>
+
+        <label for="userPhone">Phone: </label>
         <p class="userPhone" id="userPhone" th:text="${user.phone}"></p>
+
+        <label for="userCountry">Country: </label>
         <p class="userCountry" id="userCountry" th:text="${user.country}"></p>
+
+        <label for="userCity">City: </label>
         <p class="userCity" id="userCity" th:text="${user.city}"></p>
+
+        <label for="userAge">Age: </label>
         <p class="userAge" id="userAge" th:text="${user.age}"></p>
+
+        <label for="userDateRegistered">Date registered: </label>
         <p class="userDateRegistered" id="userDateRegistered" th:text="${user.dateRegistered}"></p>
+
+        <label for="userDateLastActive">Last active: </label>
         <p class="userDateLastActive" id="userDateLastActive" th:text="${user.dateLastActive}"></p>
+
+        <label for="userRelationshipStatus">Relationship status: </label>
         <p class="userRelationshipStatus" id="userRelationshipStatus" th:text="${user.relationshipStatus}"></p>
+
+        <label for="userReligion">Religion: </label>
         <p class="userReligion" id="userReligion" th:text="${user.religion}"></p>
+
+        <label for="userSchool">School: </label>
         <p class="userSchool" id="userSchool" th:text="${user.school}"></p>
+
+        <label for="userUniversity">University: </label>
         <p class="userUniversity" id="userUniversity" th:text="${user.university}"></p>
 
         <hr>
@@ -84,13 +108,13 @@
                 <form id="tagged-users-form">
                     <p>Tagged users</p>
 
-                    <input id="tagged-users-input" list="taggedUsers" name="taggedUsers"
+                    <!--<input id="tagged-users-input" list="taggedUsers" name="taggedUsers"-->
                     <!--oninput="getFriendsByPattern()"-->>
-                    <datalist id="taggedUsers">
-                        <th:block th:each="friend : ${friends}">
-                            <option th:value="${friend.firstName} ${friend.lastName}"></option>
-                        </th:block>
-                    </datalist>
+                    <!--<datalist id="taggedUsers">-->
+                    <!--<th:block th:each="friend : ${friends}">-->
+                    <!--<option th:value="${friend.firstName} ${friend.lastName}"></option>-->
+                    <!--</th:block>-->
+                    <!--</datalist>-->
 
                     <button type="submit">Tag</button>
                 </form>
@@ -103,6 +127,8 @@
 
             <button id="hide-post-form-btn" onclick="hidePostForm()">Cancel</button>
         </div>
+
+        <div id="posts-on-page-div"></div>
     </div>
 </div>
 

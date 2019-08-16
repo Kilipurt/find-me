@@ -1,0 +1,17 @@
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration>
+
+    <appender name="fileAppender" class="org.apache.log4j.RollingFileAppender">
+        <param name="File" value="D:\\log_file.log"/>
+        <param name="MaxFileSize" value="1MB"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n"/>
+        </layout>
+    </appender>
+
+    <root>
+        <level value="INFO"/>
+        <appender-ref ref="fileAppender"/>
+    </root>
+
+</log4j:configuration>
