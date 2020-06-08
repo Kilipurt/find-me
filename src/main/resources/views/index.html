@@ -1,80 +1,81 @@
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org">
+<html>
 <head>
     <meta charset="UTF-8">
-    <title>Find me</title>
+    <title>Social network</title>
 </head>
 <body>
+<div id="content">
+    <h1 class="title">Вітаємо!</h1>
 
-<h1 class="title">Welcome to Find me!</h1>
+    <div class="left">
+        <form id="login-form">
+            <p>Логін</p>
+            <input id="phone" name="phone" type="text" required>
 
-<div class="left">
-    <form id="login-form">
-        <p>Login</p>
-        <input id="phone" name="phone" type="text" required>
+            <p>Пароль</p>
+            <input id="password" name="password" type="text" required>
 
-        <p>Password</p>
-        <input id="password" name="password" type="text" required>
+            <p>
+                <button type="submit">Вхід</button>
+            </p>
+        </form>
 
-        <p>
-            <button type="submit">Login</button>
-        </p>
-    </form>
+        <button id="registration-button" onclick="displayRegistrationForm()">Реєстрація</button>
+    </div>
 
-    <button id="registration-button" onclick="displayRegistrationForm()">Registration</button>
-</div>
+    <div class="right">
+        <form id="registration-form">
+            <div class="form-fields-wrap">
+                <div class="left-form-side">
+                    <p>*Ім'я:</p>
+                    <input type="text" name="firstName" required>
 
-<div class="right">
-    <form id="registration-form">
-        <div class="form-fields-wrap">
-            <div class="left-form-side">
-                <p>*First name:</p>
-                <input type="text" name="firstName" required>
+                    <p>*Прізвище:</p>
+                    <input type="text" name="lastName" required>
 
-                <p>*Last name:</p>
-                <input type="text" name="lastName" required>
+                    <p>*Телефон</p>
+                    <input type="text" name="phone" required>
 
-                <p>*Phone</p>
-                <input type="text" name="phone" required>
+                    <p>*Пароль</p>
+                    <input type="text" name="password" required>
 
-                <p>*Password</p>
-                <input type="text" name="password" required>
+                    <p>*Країна:</p>
+                    <input type="text" name="country" required>
 
-                <p>*Country:</p>
-                <input type="text" name="country" required>
+                    <p>*Місто:</p>
+                    <input type="text" name="city" required>
+                </div>
 
-                <p>*City:</p>
-                <input type="text" name="city" required>
+                <div class="right-form-side">
+                    <p>*Вік:</p>
+                    <input type="number" name="age" required>
+
+                    <p>Статус у відносинах:</p>
+                    <input type="text" name="relationshipStatus">
+
+                    <p>Релігійні переконання:</p>
+                    <input type="text" name="religion">
+
+                    <p>Школа:</p>
+                    <input type="text" name="school">
+
+                    <p>Університет:</p>
+                    <input type="text" name="university">
+                </div>
             </div>
 
-            <div class="right-form-side">
-                <p>*Age:</p>
-                <input type="number" name="age" required>
+            <div class="submit-form">
+                <p>Поля відмічені * є обов'язковими</p>
 
-                <p>Relationship status:</p>
-                <input type="text" name="relationshipStatus">
+                <button type="submit">Зареєструватися</button>
 
-                <p>Religion:</p>
-                <input type="text" name="religion">
-
-                <p>School:</p>
-                <input type="text" name="school">
-
-                <p>University:</p>
-                <input type="text" name="university">
+                <button onclick="hideRegistrationForm()">Відміна</button>
             </div>
-        </div>
+        </form>
 
-        <div class="submit-form">
-            <p>Fields, that was marked as *, are required</p>
-
-            <button type="submit">Register</button>
-
-            <button onclick="hideRegistrationForm()">Cancel</button>
-        </div>
-    </form>
-
-    <div id="info" class="info">Some info</div>
+        <div id="info" class="info">Інформація про соціальну мережу</div>
+    </div>
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -135,6 +136,10 @@
         background-color: honeydew;
     }
 
+    .info {
+        width: 100%;
+    }
+
     .left {
         background-color: lightblue;
         border: 2px solid cornflowerblue;
@@ -171,7 +176,7 @@
         padding-top: 50px;
     }
 
-    .title, .header {
+    .title {
         text-align: center;
     }
 </style>

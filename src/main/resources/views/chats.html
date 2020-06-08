@@ -1,19 +1,94 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
     <title>Find me</title>
+    <style>
+        body {
+            background-color: honeydew;
+            font-family: Tahoma, Verdana, Segoe, sans-serif;
+        }
+
+        a {
+            font-weight: 700;
+            text-decoration: none;
+            border-radius: 3px;
+            background: inherit;
+            transition: 0.2s;
+            margin: 5px;
+        }
+
+        a:hover {
+            background: honeydew;
+        }
+
+        .menu {
+            background-color: lightblue;
+            border: 2px solid cornflowerblue;
+            border-radius: 30px;
+            float: left;
+            padding: 20px;
+            margin: 40px 20px 20px 20px;
+            position: absolute;
+            left: 100px;
+            height: auto;
+        }
+
+        .menu ul {
+            list-style: none;
+        }
+
+        .menu ul li button {
+            display: block;
+            margin-top: 3px;
+            padding-left: 5px;
+            padding-top: 4px;
+            padding-bottom: 4px;
+        }
+
+        .chats {
+            background-color: lightblue;
+            width: 60%;
+            border: 2px solid cornflowerblue;
+            border-radius: 30px;
+            position: absolute;
+            left: 300px;
+            margin: 20px;
+        }
+
+        #chats-title {
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
+<div class="menu">
+    <a href="#" id="my-profile-btn">Моя сторінка</a>
+    <br>
 
-<div id="message">
+    <a href="#" id="get-feed-btn">Новини</a>
+    <br>
+
+    <a href="#" id="get-chats-btn">Чати</a>
+    <br>
+
+    <hr>
+    <a href="#" id="logout-btn">Вийти</a>
+</div>
+<div class="chats">
+    <h1 id="chats-title">Чати</h1>
     <div th:if="${users.empty}">
-        <p>No Chats Available</p>
+        <p>Немає доступних чатів</p>
     </div>
-    <div th:each="user : ${users}">
-        <span id="userId" th:text="${user.id}" hidden></span>
-        <span th:text="${user.firstName}"></span>
-        <span th:text="${user.lastName}"></span>
-        <button th:id="${user.id}" onclick="deleteChat(this.id)">Delete</button>
+    <div th:unless="${users.empty}">
+        <div th:each="user : ${users}" th:id="${user.id}">
+            <span id="userId" th:text="${user.id}" hidden></span>
+            <span th:text="${user.firstName}"></span>
+            <span th:text="${user.lastName}"></span>
+            <button th:id="${user.id}" onclick="openChat(this.id)">Відкрити</button>
+            <button th:id="${user.id}" onclick="deleteChat(this.id)">Видалити</button>
+            <hr>
+        </div>
     </div>
 </div>
 
@@ -25,14 +100,26 @@
 </style>
 
 <!--<script>-->
-    <!--$(document).ready(function () {-->
-        <!--alert(JSON.parse(localStorage.getItem('loggedInUser')).id);-->
-    <!--});-->
+<!--$(document).ready(function () {-->
+<!--alert(JSON.parse(localStorage.getItem('loggedInUser')).id);-->
+<!--});-->
 <!--</script>-->
 <script>
+    var loggedInUser;
+
     $(document).ready(function () {
         $.ajax({
-            url: "/get-chats/" + loggedInUser.id,
+            url: "/get-logged-user",
+            type: "GET",
+            success: function (xhr) {
+                loggedInUser = xhr;
+            }
+        });
+    });
+
+    $(document).ready(setTimeout(function () {
+        $.ajax({
+            url: "/get-chats",
             type: "GET",
             error: function error(xhr) {
                 alert(xhr.responseText);
@@ -40,14 +127,14 @@
         });
 
         return false;
-    });
+    }, 500));
 
     function deleteChat(id) {
         $.ajax({
-            url: "/delete-chat/",
+            url: "/delete-chat",
             type: "PUT",
             data: {
-                "loggedInUser": loggedInUser.id,
+                "loggedInUserId": loggedInUser.id,
                 "userId": id
             },
             error: function error(xhr) {
@@ -55,5 +142,37 @@
             }
         });
     }
+
+    function openChat(id) {
+        window.location.replace("/open-chat/" + id);
+    }
+
+    $('#get-chats-btn').on('click', function getChats() {
+        window.location.replace("/chats/" + loggedInUser.id);
+    });
+
+    $('#get-feed-btn').on('click', function getFeed() {
+        window.location.replace("/feed/" + loggedInUser.id);
+    });
+
+    $('#my-profile-btn').on('click', function getProfile() {
+        window.location.replace('/user/' + loggedInUser.id);
+    });
+
+    $('#logout-btn').on('click', function () {
+        $.ajax({
+            url: "/logout",
+            type: "GET",
+            success: function success() {
+                loggedInUser = null;
+                window.location.replace("/");
+            },
+            error: function error(xhr) {
+                alert(xhr.responseText);
+            }
+        });
+
+        return false;
+    });
 </script>
 </html>

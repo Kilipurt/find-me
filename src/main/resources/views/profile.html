@@ -2,95 +2,238 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Find me</title>
+    <title>Веб-додаток "Соціальна мережа"</title>
+
+    <style>
+        body {
+            background-color: honeydew;
+            font-family: Tahoma, Verdana, Segoe, sans-serif;
+        }
+
+        a {
+            font-weight: 700;
+            text-decoration: none;
+            border-radius: 3px;
+            background: inherit;
+            transition: 0.2s;
+            margin: 5px;
+        }
+
+        a:hover {
+            background: honeydew;
+        }
+
+        .hiddenProfInfo {
+            display: none;
+        }
+
+        .post-hide-info {
+            display: none;
+        }
+
+        .menu {
+            background-color: lightblue;
+            border: 2px solid cornflowerblue;
+            border-radius: 30px;
+            float: left;
+            padding: 20px;
+            margin: 40px 20px 20px 20px;
+            position: absolute;
+            left: 100px;
+            height: auto;
+        }
+
+        .info-row {
+            display: flex;
+            flex-direction: row;
+            align-items: center
+        }
+
+        .posts {
+            background-color: lightblue;
+            border: 2px solid cornflowerblue;
+            border-radius: 30px;
+            padding: 20px;
+            margin: 40px 20px 20px 20px;
+            height: auto;
+        }
+
+        .menu ul {
+            list-style: none;
+        }
+
+        .menu ul li button {
+            display: block;
+            margin-top: 3px;
+            padding-left: 5px;
+            padding-top: 4px;
+            padding-bottom: 4px;
+        }
+
+        .photo {
+            text-align: center;
+            width: 200px;
+            height: 300px;
+        }
+
+        #profile-img {
+            border-style: solid;
+        }
+
+        .user-info {
+            width: 60%;
+            border: 2px solid cornflowerblue;
+            border-radius: 30px;
+            position: absolute;
+            left: 300px;
+            margin: 20px;
+        }
+
+        .right {
+            margin: 20px;
+            padding: 20px;
+        }
+
+        .left {
+            background-color: lightblue;
+            border: 2px solid cornflowerblue;
+            border-radius: 30px;
+            float: left;
+            padding: 20px;
+            margin: 20px 50px 20px 20px;
+        }
+
+        .right {
+            background-color: lightblue;
+            border: 2px solid cornflowerblue;
+            border-radius: 30px;
+            overflow: auto;
+            margin: 20px;
+        }
+
+        .userId, .loginUserId {
+            display: none;
+        }
+    </style>
 </head>
 <body>
 <div class="menu">
-    <a href="#" id="my-profile-btn">My profile</a>
+    <a href="#" id="my-profile-btn">Моя сторінка</a>
     <br>
 
-    <a href="#" id="get-feed-btn">News</a>
+    <a href="#" id="get-feed-btn">Новини</a>
     <br>
 
-    <a href="#" id="get-chats-btn">Chats</a>
+    <a href="#" id="get-chats-btn">Чати</a>
     <br>
 
     <hr>
-    <a href="#" id="logout-btn">Logout</a>
+    <a href="#" id="logout-btn">Вийти</a>
 </div>
 
 <div class="user-info">
     <div class="left">
-        <div class="photo">Photo</div>
+        <div class="photo"><img id="profile-img" class="photo"
+                                src="https://www.no5.com/media/1772/personplaceholder.jpg"/></div>
 
         <div class="relationship-status" id="relationship-status">
             <p id="status-field"></p>
         </div>
 
         <p>
-            <button id="send-friend-request-btn" type="submit">Add to friends</button>
+            <button id="send-friend-request-btn" type="submit">Додати до друзів</button>
         </p>
 
         <p>
-            <button id="send-message-form-display-btn" onclick="displaySendMessageForm()">Sent message</button>
+            <button id="send-message-form-display-btn" onclick="displaySendMessageForm()">Надіслати повідомлення
+            </button>
         </p>
 
         <form id="send-message-form">
-            <p>Text:</p>
+            <p>Текст:</p>
             <input id="text" type="text" name="text"/>
-            <button type="submit">Send Message</button>
+            <button type="submit">Надіслати</button>
         </form>
-        <button id="hide-send-message-form-btn" onclick="hideSendMessageForm()">Cancel</button>
+        <button id="hide-send-message-form-btn" onclick="hideSendMessageForm()">Відмінити</button>
     </div>
 
     <div class="right">
         <p class="userId" id="userId" th:text="${user.id}"></p>
 
-        <label for="userFirstName">First name: </label>
-        <p class="userFirstName" id="userFirstName" th:text="${user.firstName}"></p>
+        <div class="info-row">
+            <label for="userFirstName">Ім'я: </label>
+            <p class="userFirstName" id="userFirstName" th:text="${user.firstName}"></p>
+        </div>
 
-        <label for="userLastName">Last name: </label>
-        <p class="userLastName" id="userLastName" th:text="${user.lastName}"></p>
+        <div class="info-row">
+            <label for="userLastName">Прізвище: </label>
+            <p class="userLastName" id="userLastName" th:text="${user.lastName}"></p>
+        </div>
 
-        <label for="userPhone">Phone: </label>
-        <p class="userPhone" id="userPhone" th:text="${user.phone}"></p>
+        <div class="info-row">
+            <label for="userPhone">Телефон: </label>
+            <p class="userPhone" id="userPhone" th:text="${user.phone}"></p>
+        </div>
 
-        <label for="userCountry">Country: </label>
-        <p class="userCountry" id="userCountry" th:text="${user.country}"></p>
+        <button id="more-prof-info-btn">Більше</button>
 
-        <label for="userCity">City: </label>
-        <p class="userCity" id="userCity" th:text="${user.city}"></p>
+        <div class="info-row">
+            <label class="hiddenProfInfo" for="userCountry">Країна: </label>
+            <p class="userCountry hiddenProfInfo" id="userCountry" th:text="${user.country}"></p>
+        </div>
 
-        <label for="userAge">Age: </label>
-        <p class="userAge" id="userAge" th:text="${user.age}"></p>
+        <div class="info-row">
+            <label class="hiddenProfInfo" for="userCity">Місто: </label>
+            <p class="userCity hiddenProfInfo" id="userCity" th:text="${user.city}"></p>
+        </div>
 
-        <label for="userDateRegistered">Date registered: </label>
-        <p class="userDateRegistered" id="userDateRegistered" th:text="${user.dateRegistered}"></p>
+        <div class="info-row">
+            <label class="hiddenProfInfo" for="userAge">Вік: </label>
+            <p class="userAge hiddenProfInfo" id="userAge" th:text="${user.age}"></p>
+        </div>
 
-        <label for="userDateLastActive">Last active: </label>
-        <p class="userDateLastActive" id="userDateLastActive" th:text="${user.dateLastActive}"></p>
+        <div class="info-row">
+            <label class="hiddenProfInfo" for="userDateRegistered">Дата реєстрації: </label>
+            <p class="userDateRegistered hiddenProfInfo" id="userDateRegistered" th:text="${user.dateRegistered}"></p>
+        </div>
 
-        <label for="userRelationshipStatus">Relationship status: </label>
-        <p class="userRelationshipStatus" id="userRelationshipStatus" th:text="${user.relationshipStatus}"></p>
+        <div class="info-row">
+            <label class="hiddenProfInfo" for="userDateLastActive">Остання активність: </label>
+            <p class="userDateLastActive hiddenProfInfo" id="userDateLastActive" th:text="${user.dateLastActive}"></p>
+        </div>
 
-        <label for="userReligion">Religion: </label>
-        <p class="userReligion" id="userReligion" th:text="${user.religion}"></p>
+        <div class="info-row">
+            <label class="hiddenProfInfo" for="userRelationshipStatus">Статус у відновинах: </label>
+            <p class="userRelationshipStatus hiddenProfInfo" id="userRelationshipStatus"
+               th:text="${user.relationshipStatus}"></p>
+        </div>
 
-        <label for="userSchool">School: </label>
-        <p class="userSchool" id="userSchool" th:text="${user.school}"></p>
+        <div class="info-row">
+            <label class="hiddenProfInfo" for="userReligion">Релігійні переконання: </label>
+            <p class="userReligion hiddenProfInfo" id="userReligion" th:text="${user.religion}"></p>
+        </div>
 
-        <label for="userUniversity">University: </label>
-        <p class="userUniversity" id="userUniversity" th:text="${user.university}"></p>
+        <div class="info-row">
+            <label class="hiddenProfInfo" for="userSchool">Школа: </label>
+            <p class="userSchool hiddenProfInfo" id="userSchool" th:text="${user.school}"></p>
+        </div>
+
+        <div class="info-row">
+            <label class="hiddenProfInfo" for="userUniversity">Університет: </label>
+            <p class="userUniversity hiddenProfInfo" id="userUniversity" th:text="${user.university}"></p>
+        </div>
+
+        <button id="less-prof-info-btn" class="hiddenProfInfo">Менше</button>
 
         <hr>
 
         <div class="requests">
             <div class="income-requests" id="income-requests">
-                <h4>Income Requests</h4>
+                <h4>Вхідні запити</h4>
             </div>
 
             <div class="outcome-requests" id="outcome-requests">
-                <h4>Outcome Requests</h4>
+                <h4>Вихідні запити</h4>
             </div>
         </div>
     </div>
@@ -99,33 +242,35 @@
 
     <div class="posts">
         <div class="create-post-div">
-            <button id="display-post-form-btn" onclick="displayPostForm()">New post</button>
+            <button id="display-post-form-btn" onclick="displayPostForm()">Новий пост</button>
 
-            <form id="post-form">
-                <p>Text</p>
+            <hr>
+
+            <form id="post-form" class="post-hide-info">
+                <p>Текст</p>
                 <input id="post-message" name="post-message" type="text"/>
 
-                <form id="tagged-users-form">
-                    <p>Tagged users</p>
+                <!--                <form id="tagged-users-form" hidden>-->
+                <!--                    <p>Tagged users</p>-->
 
-                    <!--<input id="tagged-users-input" list="taggedUsers" name="taggedUsers"-->
-                    <!--oninput="getFriendsByPattern()"-->>
-                    <!--<datalist id="taggedUsers">-->
-                    <!--<th:block th:each="friend : ${friends}">-->
-                    <!--<option th:value="${friend.firstName} ${friend.lastName}"></option>-->
-                    <!--</th:block>-->
-                    <!--</datalist>-->
+                <!--                    &lt;!&ndash;<input id="tagged-users-input" list="taggedUsers" name="taggedUsers"&ndash;&gt;-->
+                <!--                    &lt;!&ndash;oninput="getFriendsByPattern()"&ndash;&gt;>-->
+                <!--                    &lt;!&ndash;<datalist id="taggedUsers">&ndash;&gt;-->
+                <!--                    &lt;!&ndash;<th:block th:each="friend : ${friends}">&ndash;&gt;-->
+                <!--                    &lt;!&ndash;<option th:value="${friend.firstName} ${friend.lastName}"></option>&ndash;&gt;-->
+                <!--                    &lt;!&ndash;</th:block>&ndash;&gt;-->
+                <!--                    &lt;!&ndash;</datalist>&ndash;&gt;-->
 
-                    <button type="submit">Tag</button>
-                </form>
+                <!--                    <button type="submit">Tag</button>-->
+                <!--                </form>-->
 
-                <p>Location</p>
-                <input id="location" name="location" type="text"/>
+                <p class="post-hide-info">Місце</p>
+                <input id="location" class="post-hide-info" name="location" type="text"/>
 
-                <button type="submit">Create</button>
+                <button id="create-post-btn" class="post-hide-info" type="submit">Створити</button>
             </form>
 
-            <button id="hide-post-form-btn" onclick="hidePostForm()">Cancel</button>
+            <button id="hide-post-form-btn" class="post-hide-info" onclick="hidePostForm()">Відмінити</button>
         </div>
 
         <div id="posts-on-page-div"></div>
@@ -135,98 +280,17 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </body>
 
-<style>
-    body {
-        background-color: honeydew;
-    }
-
-    a {
-        font-weight: 700;
-        text-decoration: none;
-        border-radius: 3px;
-        background: inherit;
-        transition: 0.2s;
-        margin: 5px;
-    }
-
-    a:hover {
-        background: honeydew;
-    }
-
-    .menu {
-        background-color: lightblue;
-        border: 2px solid cornflowerblue;
-        border-radius: 30px;
-        float: left;
-        padding: 20px;
-        margin: 40px 20px 20px 20px;
-        position: absolute;
-        left: 100px;
-        height: auto;
-    }
-
-    .menu ul {
-        list-style: none;
-    }
-
-    .menu ul li button {
-        display: block;
-        margin-top: 3px;
-        padding-left: 5px;
-        padding-top: 4px;
-        padding-bottom: 4px;
-    }
-
-    .photo {
-        text-align: center;
-        width: 200px;
-        height: 300px;
-        border-style: solid;
-    }
-
-    .user-info {
-        border: 2px solid cornflowerblue;
-        border-radius: 30px;
-        position: absolute;
-        left: 250px;
-        margin: 20px;
-    }
-
-    .right {
-        margin: 20px;
-        padding: 20px;
-    }
-
-    .left {
-        background-color: lightblue;
-        border: 2px solid cornflowerblue;
-        border-radius: 30px;
-        float: left;
-        padding: 20px;
-        margin: 20px 50px 20px 20px;
-    }
-
-    .right {
-        background-color: lightblue;
-        border: 2px solid cornflowerblue;
-        border-radius: 30px;
-        overflow: auto;
-        margin: 20px;
-    }
-
-    .userId, .loginUserId {
-        display: none;
-    }
-</style>
-
 <script th:inline="javascript">
-    var loggedInUser = JSON.parse(localStorage.getItem('user'));
+    var loggedInUser;
 
     $(document).ready(function () {
-        if (loggedInUser == null) {
-            loggedInUser = [[${user}]];
-            localStorage.setItem('user', JSON.stringify(loggedInUser));
-        }
+        $.ajax({
+            url: "/get-logged-user",
+            type: "GET",
+            success: function (xhr) {
+               loggedInUser = xhr;
+            }
+        });
     });
 
     $(document).ready(function getRelationshipStatus() {
@@ -238,14 +302,19 @@
             },
             success: function (xhr) {
                 var relationship = JSON.parse(xhr);
-                $('#status-field').text(relationship.status);
+                if (relationship != null) {
+                    $('#status-field').text(relationship.status);
+                } else {
+                    $('#status-field').text("Не в друзях");
+                }
             }
         });
 
         return false;
     });
 
-    $(document).ready(function () {
+    $(document).ready(setTimeout(function () {
+
         hidePostForm();
         hideSendMessageForm();
 
@@ -262,18 +331,26 @@
         if ($('#status-field').text() == 'FRIENDS') {
             document.getElementById('send-friend-request-btn').style.display = 'none';
         }
+    }, 500));
+
+    $('#more-prof-info-btn').on('click', function () {
+        $('.hiddenProfInfo').show();
+        $('#more-prof-info-btn').hide();
+    });
+
+    $('#less-prof-info-btn').on('click', function () {
+        $('.hiddenProfInfo').hide();
+        $('#more-prof-info-btn').show();
     });
 
     function displayPostForm() {
-        document.getElementById('post-form').style.display = 'block';
-        document.getElementById('hide-post-form-btn').style.display = 'block';
-        document.getElementById('display-post-form-btn').style.display = 'none';
+        $('.post-hide-info').show();
+        $('#display-post-form-btn').hide();
     }
 
     function hidePostForm() {
-        document.getElementById('post-form').style.display = 'none';
-        document.getElementById('hide-post-form-btn').style.display = 'none';
-        document.getElementById('display-post-form-btn').style.display = 'block';
+        $('.post-hide-info').hide();
+        $('#display-post-form-btn').show();
     }
 
     function displaySendMessageForm() {
@@ -300,7 +377,7 @@
         window.location.replace('/user/' + loggedInUser.id);
     });
 
-    $('#logout').on('click', function () {
+    $('#logout-btn').on('click', function () {
         $.ajax({
             url: "/logout",
             type: "GET",
@@ -343,7 +420,7 @@
         return false;
     });
 
-    $(document).ready(function () {
+    $(document).ready(setTimeout(function () {
         if ($('#userId').text() == loggedInUser.id) {
             $.ajax({
                 url: "/income-requests",
@@ -375,9 +452,9 @@
             });
         }
         return false;
-    });
+    }, 500));
 
-    $(document).ready(function () {
+    $(document).ready(setTimeout(function () {
         if ($('#userId').text() == loggedInUser.id) {
             $.ajax({
                 url: "/outcome-requests",
@@ -404,10 +481,10 @@
             });
         }
         return false;
-    });
+    }, 500));
 
     $('#send-friend-request-btn').on("click", function () {
-        if ($('#status-field').text() == 'Not friends') {
+        if ($('#status-field').text() == 'Не в друзях') {
             $.ajax({
                 url: "/add-relationship",
                 type: "POST",
@@ -430,7 +507,7 @@
     });
 
     function cancelRequest() {
-        updateRelationship("/update-relationship?&userIdTo=" + this.id.replace('cancelButton', '') + "&status=DELETED");
+        updateRelationship("/update-relationship?userIdTo=" + this.id.replace('cancelButton', '') + "&status=DELETED");
     }
 
     function denyRequest() {
@@ -456,13 +533,75 @@
         return false;
     }
 
-    $("#post-form").on('submit', function () {
+    $(document).ready(function () {
+        $.ajax({
+            url: "/get-posts",
+            type: "GET",
+            data: {
+                userPostedPageId: $('#userId').text()
+            },
+            success: function success(xhr) {
+                var pagePostsDiv = document.getElementById("posts-on-page-div");
+                var posts = JSON.parse(xhr.toString());
+                for (var i = 0; i < posts.length; i++) {
+                    var ye = new Intl.DateTimeFormat('en', {year: 'numeric'}).format(posts[i].datePosted);
+                    var mo = new Intl.DateTimeFormat('en', {month: 'short'}).format(posts[i].datePosted);
+                    var da = new Intl.DateTimeFormat('en', {day: '2-digit'}).format(posts[i].datePosted);
+
+                    var singlePostDiv = document.createElement("div");
+                    singlePostDiv.innerHTML = posts[i].message + "<br>"
+                        + posts[i].location
+                        + "<br>Опублікований " + posts[i].userPosted.firstName + " " + posts[i].userPosted.lastName
+                        + "<br><br>Дата публікації " + da + "-" + mo + "-" + ye;
+                    var deleteButton = document.createElement("button");
+                    deleteButton.innerHTML = "Видалити";
+                    deleteButton.id = "dlt-post-btn" + posts[i].id + "_" + posts[i].userPosted.id;
+                    deleteButton.addEventListener("click", deletePost);
+                    singlePostDiv.insertAdjacentElement("beforeEnd", document.createElement("br"))
+                    singlePostDiv.insertAdjacentElement("beforeEnd", deleteButton);
+                    pagePostsDiv.insertAdjacentElement("afterBegin", document.createElement("hr"));
+                    pagePostsDiv.insertAdjacentElement("afterBegin", singlePostDiv);
+                }
+            },
+            error: function error(xhr) {
+                alert(xhr.responseText);
+            }
+        });
+
+        return false;
+    });
+
+    function deletePost() {
+        var ids = this.id.replace('dlt-post-btn', '').split("_");
+        var postId = ids[0];
+        var userPostedId = ids[1];
+
+        $.ajax({
+            url: "/delete-post",
+            type: "DELETE",
+            data: {
+                userPostedId: userPostedId,
+                postId: postId
+            },
+            error: function error(xhr) {
+                alert(xhr.responseText);
+            }
+        });
+
+        return false;
+    }
+
+    $("#create-post-btn").on('click', function () {
         //TODO users tagged
         var post = {
             message: document.getElementById("post-message").value,
-            usersTagged: document.getElementById("taggedUsers").value,
-            userPosted: loggedInUser.id,
-            userPagePosted: $('#userId').text(),
+            // usersTagged: [],
+            userPosted: {
+                id: loggedInUser.id
+            },
+            userPagePosted: {
+                id: $('#userId').text()
+            },
             location: document.getElementById("location").value
         };
 
