@@ -3,6 +3,7 @@ package com.findme.controller.statusResponseController;
 import com.findme.exception.BadRequestException;
 import com.findme.models.Post;
 import com.findme.models.PostFilter;
+import com.findme.models.PostsFiltrationType;
 import com.findme.models.User;
 import com.findme.service.PostService;
 import com.findme.util.JsonUtil;
@@ -10,7 +11,11 @@ import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
@@ -39,7 +44,7 @@ public class PostControllerStatus {
         return new ResponseEntity<>(jsonUtil.toJson(friendsPosts), HttpStatus.OK);
     }
 
-    @RequestMapping(path = "/add-post", method = RequestMethod.POST)
+    @RequestMapping(path = "/add-post", method = RequestMethod.POST, consumes = "application/json")
     public ResponseEntity<String> addPost(@RequestBody Post post) throws Exception {
         log.info("PostController addPost method. Adding new post");
 
@@ -48,8 +53,10 @@ public class PostControllerStatus {
     }
 
     @RequestMapping(path = "/get-posts", method = RequestMethod.GET)
-    public ResponseEntity<String> getPosts(@RequestBody PostFilter postFilter) throws Exception {
+    public ResponseEntity<String> getPosts(@RequestParam String userPostedPageId) throws Exception {
         log.info("PostController getPosts method. Selecting posts by filter");
+
+        PostFilter postFilter = new PostFilter(Long.parseLong(userPostedPageId), 0, 0, PostsFiltrationType.DEFAULT);
 
         List<Post> posts = postService.getPostsByFilter(postFilter);
         return new ResponseEntity<>(jsonUtil.toJson(posts), HttpStatus.OK);

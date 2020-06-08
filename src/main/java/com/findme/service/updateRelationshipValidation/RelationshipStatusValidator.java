@@ -25,21 +25,26 @@ public class RelationshipStatusValidator extends GeneralValidator {
                 || status.equals(RelationshipStatus.REQUEST_DECLINED.toString())
                 || status.equals(RelationshipStatus.DELETED.toString()))) {
             validateNext(validationData);
+            return;
         }
 
         if (oldStatus.equals(RelationshipStatus.FRIENDS.toString())
                 && status.equals(RelationshipStatus.PAST_FRIENDS.toString())) {
             validateNext(validationData);
+            return;
         }
 
         if (oldStatus.equals(RelationshipStatus.REQUEST_DECLINED.toString())
                 && status.equals(RelationshipStatus.REQUEST_SENT.toString())) {
             validateNext(validationData);
+            return;
         }
 
-        if (oldStatus.equals(RelationshipStatus.PAST_FRIENDS.toString())
+        if ((oldStatus.equals(RelationshipStatus.PAST_FRIENDS.toString())
+                || oldStatus.equals(RelationshipStatus.DELETED.toString()))
                 && status.equals(RelationshipStatus.REQUEST_SENT.toString())) {
             validateNext(validationData);
+            return;
         }
 
         log.error("RelationshipStatusValidator validate method. It's impossible to update relationship to the " +

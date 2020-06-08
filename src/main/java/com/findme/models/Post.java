@@ -28,11 +28,11 @@ public class Post {
     @JoinColumn(name = "USER_POSTED")
     private User userPosted;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "USER_POST",
-            joinColumns = @JoinColumn(name = "POST_ID"),
-            inverseJoinColumns = @JoinColumn(name = "USER_ID"))
-    private List<User> usersTagged;
+//    @ManyToMany(fetch = FetchType.EAGER)
+//    @JoinTable(name = "USER_POST",
+//            joinColumns = @JoinColumn(name = "POST_ID"),
+//            inverseJoinColumns = @JoinColumn(name = "USER_ID"))
+//    private List<User> usersTagged;
 
     @OneToOne
     @JoinColumn(name = "USER_PAGE_POSTED")

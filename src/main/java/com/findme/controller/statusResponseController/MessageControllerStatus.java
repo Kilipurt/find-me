@@ -33,7 +33,7 @@ public class MessageControllerStatus {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @RequestMapping(path = "/delete-chat/", method = RequestMethod.PUT)
+    @RequestMapping(path = "/delete-chat", method = RequestMethod.PUT)
     public ResponseEntity<String> deleteChat(HttpSession session, @RequestParam String loggedInUserId,
                                              @RequestParam String userId) throws Exception {
         long id = Long.parseLong(loggedInUserId);

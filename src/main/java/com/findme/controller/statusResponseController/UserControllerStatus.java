@@ -25,6 +25,12 @@ public class UserControllerStatus {
         this.jsonUtil = jsonUtil;
     }
 
+    @RequestMapping(path = "/get-logged-user", method = RequestMethod.GET)
+    public ResponseEntity<User> getLoggedInUser(HttpSession session) throws Exception {
+        User user = (User) session.getAttribute("user");
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
     @RequestMapping(path = "/user-registration", method = RequestMethod.POST)
     public ResponseEntity<String> registerUser(@ModelAttribute User user) throws Exception {
         log.info("UserController registerUser method. Register new user");
