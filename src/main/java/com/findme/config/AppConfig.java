@@ -2,18 +2,16 @@ package com.findme.config;
 
 import com.findme.controller.Interceptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -24,10 +22,11 @@ import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 import javax.persistence.EntityManagerFactory;
 import java.util.Properties;
 
-@Configuration
-@EnableTransactionManagement
-@EnableWebMvc
-@ComponentScan(basePackages = {"com"})
+@SpringBootApplication(scanBasePackages = {"com"})
+//@Configuration
+//@EnableTransactionManagement
+//@EnableWebMvc
+//@ComponentScan(basePackages = {"com"})
 public class AppConfig implements WebMvcConfigurer {
 
     @Autowired
@@ -66,7 +65,7 @@ public class AppConfig implements WebMvcConfigurer {
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource());
-        em.setPackagesToScan(new String[]{"com"});
+        em.setPackagesToScan("com");
 
         JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
@@ -84,9 +83,9 @@ public class AppConfig implements WebMvcConfigurer {
     @Bean
     public DriverManagerDataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName("oracle.jdbc.driver.OracleDriver");
-        dataSource.setUrl("jdbc:oracle:thin:@192.168.1.4:1521:XE");
-        dataSource.setUsername("sys as sysdba");
+        dataSource.setDriverClassName("org.h2.Driver");
+        dataSource.setUrl("jdbc:h2:~/test");
+        dataSource.setUsername("main");
         dataSource.setPassword("123");
         return dataSource;
     }
@@ -97,5 +96,9 @@ public class AppConfig implements WebMvcConfigurer {
         transactionManager.setEntityManagerFactory(emf);
 
         return transactionManager;
+    }
+
+    public static void main(String[] args) {
+        SpringApplication.run(AppConfig.class, args);
     }
 }
