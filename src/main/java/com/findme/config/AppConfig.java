@@ -1,6 +1,10 @@
 package com.findme.config;
 
 import com.findme.controller.Interceptor;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
+import org.apache.log4j.RollingFileAppender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -96,6 +100,24 @@ public class AppConfig implements WebMvcConfigurer {
         transactionManager.setEntityManagerFactory(emf);
 
         return transactionManager;
+    }
+
+    @Bean
+    public void loggingConfiguration() {
+        PatternLayout layout = new PatternLayout();
+        String conversationPattern = "%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n";
+        layout.setConversionPattern(conversationPattern);
+
+        RollingFileAppender fileAppender = new RollingFileAppender();
+        String filePath = "D:\\log_file.log";
+        fileAppender.setFile(filePath);
+        fileAppender.setLayout(layout);
+        fileAppender.setMaxFileSize("1MB");
+        fileAppender.activateOptions();
+
+        Logger rootLogger = Logger.getRootLogger();
+        rootLogger.setLevel(Level.INFO);
+        rootLogger.addAppender(fileAppender);
     }
 
     public static void main(String[] args) {
