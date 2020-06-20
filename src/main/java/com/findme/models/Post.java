@@ -3,25 +3,27 @@ package com.findme.models;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.SequenceGenerator;
 import java.util.Date;
-import java.util.List;
 
 @Entity
-@Table(name = "POST")
 @Getter
 @Setter
 public class Post {
+
     @Id
     @SequenceGenerator(name = "POST_SEQ", sequenceName = "POST_SEQ", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "POST_SEQ")
-    @Column(name = "ID")
     private Long id;
 
-    @Column(name = "MESSAGE")
     private String message;
 
-    @Column(name = "DATE_POSTED")
     private Date datePosted;
 
     @OneToOne
@@ -38,7 +40,6 @@ public class Post {
     @JoinColumn(name = "USER_PAGE_POSTED")
     private User userPagePosted;
 
-    @Column(name = "LOCATION")
     private String location;
 
     //TODO
