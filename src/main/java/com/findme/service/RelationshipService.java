@@ -8,12 +8,16 @@ import com.findme.models.Relationship;
 import com.findme.models.RelationshipStatus;
 import com.findme.models.User;
 import com.findme.models.ValidationData;
-import com.findme.service.updateRelationshipValidation.*;
+import com.findme.service.updateRelationshipValidation.FriendshipTimeValidator;
+import com.findme.service.updateRelationshipValidation.GeneralValidator;
+import com.findme.service.updateRelationshipValidation.MaxFriendsValidator;
+import com.findme.service.updateRelationshipValidation.MaxOutcomeRequestValidator;
+import com.findme.service.updateRelationshipValidation.RelationshipStatusValidator;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Date;
 
 @Service
 @Log4j
@@ -45,7 +49,7 @@ public class RelationshipService {
 
         validateUsersId(userIdFrom, userIdTo);
 
-        User userTo = userDAO.findById(userIdTo);
+        User userTo = userDAO.findById(userIdTo).orElse(null);
 
         if (userTo == null) {
             log.error("RelationshipService save method. User who receives friend request does not exist");
@@ -64,7 +68,7 @@ public class RelationshipService {
 
         Relationship newRelationship = new Relationship();
         newRelationship.setStatus(RelationshipStatus.REQUEST_SENT.toString());
-        newRelationship.setUserFrom(userDAO.findById(userIdFrom));
+        newRelationship.setUserFrom(userDAO.findById(userIdFrom).orElse(null));
         newRelationship.setUserTo(userTo);
         newRelationship.setLastStatusChange(new Date());
 

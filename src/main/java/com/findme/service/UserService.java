@@ -29,7 +29,7 @@ public class UserService {
         return userDAO.save(user);
     }
 
-    public User update(User user) throws InternalServerError, BadRequestException {
+    public User update(User user) throws BadRequestException {
         log.info("UserService update method. Updating user");
 
         if (user.getId() <= 0) {
@@ -37,10 +37,10 @@ public class UserService {
             throw new BadRequestException("Wrong enter id " + user.getId());
         }
 
-        return userDAO.update(user);
+        return userDAO.save(user);
     }
 
-    public void delete(long id) throws InternalServerError, BadRequestException {
+    public void delete(long id) throws BadRequestException {
         log.info("UserService deleteSingleMessage method. Deleting user");
 
         if (id <= 0) {
@@ -48,10 +48,10 @@ public class UserService {
             throw new BadRequestException("Wrong enter id " + id);
         }
 
-        userDAO.delete(id);
+        userDAO.deleteById(id);
     }
 
-    public User findById(long id) throws BadRequestException, InternalServerError {
+    public User findById(long id) throws BadRequestException {
         log.info("UserService findById method. Searching user " + id);
 
         if (id <= 0) {
@@ -59,10 +59,10 @@ public class UserService {
             throw new BadRequestException("Wrong enter id " + id);
         }
 
-        return userDAO.findById(id);
+        return userDAO.findById(id).orElse(null);
     }
 
-    public User login(String phone, String password) throws InternalServerError, BadRequestException {
+    public User login(String phone, String password) throws BadRequestException {
         log.info("UserService login method. Login user with phone " + phone);
 
         User user = userDAO.getUserByPhone(phone);
@@ -88,7 +88,7 @@ public class UserService {
             throw new BadRequestException("Wrong user's id " + userId);
         }
 
-        return userDAO.getIncomeRequests(userId);
+        return userDAO.getIncomeRequests(String.valueOf(userId));
     }
 
     public List<User> getOutcomeRequests(long userId) throws InternalServerError, BadRequestException {
@@ -99,7 +99,7 @@ public class UserService {
             throw new BadRequestException("Wrong user's id " + userId);
         }
 
-        return userDAO.getOutcomeRequests(userId);
+        return userDAO.getOutcomeRequests(String.valueOf(userId));
     }
 
 //    public List<User> getFriends(long userId) throws InternalServerError {
