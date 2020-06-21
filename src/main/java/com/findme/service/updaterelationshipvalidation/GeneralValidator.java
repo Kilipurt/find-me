@@ -1,18 +1,10 @@
-package com.findme.service.updateRelationshipValidation;
+package com.findme.service.updaterelationshipvalidation;
 
 import com.findme.models.ValidationData;
 
 public abstract class GeneralValidator {
 
     private GeneralValidator next;
-
-    public GeneralValidator getNext() {
-        return next;
-    }
-
-    public void setNext(GeneralValidator next) {
-        this.next = next;
-    }
 
     public abstract void validate(ValidationData validationData) throws Exception;
 
