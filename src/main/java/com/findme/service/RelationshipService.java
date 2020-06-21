@@ -8,11 +8,11 @@ import com.findme.models.Relationship;
 import com.findme.models.RelationshipStatus;
 import com.findme.models.User;
 import com.findme.models.ValidationData;
-import com.findme.service.updateRelationshipValidation.FriendshipTimeValidator;
-import com.findme.service.updateRelationshipValidation.GeneralValidator;
-import com.findme.service.updateRelationshipValidation.MaxFriendsValidator;
-import com.findme.service.updateRelationshipValidation.MaxOutcomeRequestValidator;
-import com.findme.service.updateRelationshipValidation.RelationshipStatusValidator;
+import com.findme.service.updaterelationshipvalidation.FriendshipTimeValidator;
+import com.findme.service.updaterelationshipvalidation.GeneralValidator;
+import com.findme.service.updaterelationshipvalidation.MaxFriendsValidator;
+import com.findme.service.updaterelationshipvalidation.MaxOutcomeRequestValidator;
+import com.findme.service.updaterelationshipvalidation.RelationshipStatusValidator;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,7 +32,7 @@ public class RelationshipService {
         this.userDAO = userDAO;
     }
 
-    public Relationship getRelationshipByUsersId(long userIdFrom, long userIdTo) throws InternalServerError {
+    public Relationship getRelationshipByUsersId(long userIdFrom, long userIdTo) {
         log.info("RelationshipService getRelationshipStatus method. Selecting status of relationship between user "
                 + userIdFrom + " and " + userIdTo);
 
@@ -90,7 +90,7 @@ public class RelationshipService {
         relationship.setStatus(RelationshipStatus.valueOf(status).toString());
         relationship.setLastStatusChange(new Date());
 
-        return relationshipDAO.update(relationship);
+        return relationshipDAO.save(relationship);
     }
 
     private void validateForSave(Relationship relationship) throws InternalServerError, BadRequestException {
